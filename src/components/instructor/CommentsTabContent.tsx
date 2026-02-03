@@ -8,6 +8,7 @@ import {
   BookOpen,
   Video,
   ChevronRight,
+  Plus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
@@ -217,24 +225,41 @@ function CommentCard({
 interface CommentsTabContentProps {
   comentarios: Comentario[];
   clases?: Clase[];
+  programas?: { id: string; name: string }[];
   showSearch?: boolean;
   showClaseFilter?: boolean;
   showProgramaBreadcrumb?: boolean;
+  showNewCommentButton?: boolean;
   onCommentsChange?: (comments: Comentario[]) => void;
 }
 
 export function CommentsTabContent({ 
   comentarios: initialComentarios,
   clases = [],
+  programas = [],
   showSearch = true,
   showClaseFilter = true,
   showProgramaBreadcrumb = true,
+  showNewCommentButton = true,
   onCommentsChange
 }: CommentsTabContentProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'resolved'>('all');
   const [filterClase, setFilterClase] = useState<string>('all');
   const [comentarios, setComentarios] = useState(initialComentarios);
+  
+  // New comment dialog state
+  const [isNewCommentOpen, setIsNewCommentOpen] = useState(false);
+  const [newCommentPrograma, setNewCommentPrograma] = useState('');
+  const [newCommentClase, setNewCommentClase] = useState('');
+  const [newCommentContent, setNewCommentContent] = useState('');
+
+  // Get clases for selected programa
+  const clasesForPrograma = clases.filter(c => {
+    if (!newCommentPrograma) return true;
+    // In real app, clases would have programaId
+    return true; // For now show all clases
+  });
 
   const filteredComentarios = comentarios.filter(com => {
     const matchesSearch = com.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -284,59 +309,172 @@ export function CommentsTabContent({
     onCommentsChange?.(updated);
   };
 
+  const handleNewComment = () => {
+    if (!newCommentContent.trim() || !newCommentClase) return;
+    
+    const selectedClase = clases.find(c => c.id === newCommentClase);
+    const selectedPrograma = programas.find(p => p.id === newCommentPrograma);
+    
+    const newComment: Comentario = {
+      id: `com-${Date.now()}`,
+      studentName: 'Instructor',
+      programa: selectedPrograma?.name || 'Programa',
+      programaId: newCommentPrograma,
+      modulo: selectedClase?.modulo || 'Módulo',
+      clase: selectedClase?.name || 'Clase',
+      claseId: newCommentClase,
+      content: newCommentContent,
+      date: new Date().toLocaleString('es-ES', { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      status: 'open',
+      replies: [],
+    };
+    
+    const updated = [newComment, ...comentarios];
+    setComentarios(updated);
+    onCommentsChange?.(updated);
+    
+    // Reset form
+    setNewCommentContent('');
+    setNewCommentClase('');
+    setNewCommentPrograma('');
+    setIsNewCommentOpen(false);
+  };
+
   return (
     <div>
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4 mb-4">
-        {showSearch && (
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar comentarios..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
+      {/* Header with New Comment button */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div className="flex flex-wrap items-center gap-4 flex-1">
+          {showSearch && (
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar comentarios..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          )}
+          {showClaseFilter && clases.length > 0 && (
+            <Select value={filterClase} onValueChange={setFilterClase}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Filtrar por clase" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las clases</SelectItem>
+                {clases.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <div className="flex gap-2">
+            {(['all', 'open', 'resolved'] as const).map((status) => (
+              <Button
+                key={status}
+                variant={filterStatus === status ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterStatus(status)}
+                className="relative"
+              >
+                {status === 'all' && 'Todos'}
+                {status === 'open' && (
+                  <>
+                    Abiertos
+                    {openCount > 0 && (
+                      <span className="ml-1.5 bg-destructive text-destructive-foreground text-xs px-1.5 py-0.5 rounded-full">
+                        {openCount}
+                      </span>
+                    )}
+                  </>
+                )}
+                {status === 'resolved' && 'Resueltos'}
+              </Button>
+            ))}
           </div>
-        )}
-        {showClaseFilter && clases.length > 0 && (
-          <Select value={filterClase} onValueChange={setFilterClase}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Filtrar por clase" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas las clases</SelectItem>
-              {clases.map(c => (
-                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-        <div className="flex gap-2">
-          {(['all', 'open', 'resolved'] as const).map((status) => (
-            <Button
-              key={status}
-              variant={filterStatus === status ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilterStatus(status)}
-              className="relative"
-            >
-              {status === 'all' && 'Todos'}
-              {status === 'open' && (
-                <>
-                  Abiertos
-                  {openCount > 0 && (
-                    <span className="ml-1.5 bg-destructive text-destructive-foreground text-xs px-1.5 py-0.5 rounded-full">
-                      {openCount}
-                    </span>
-                  )}
-                </>
-              )}
-              {status === 'resolved' && 'Resueltos'}
-            </Button>
-          ))}
         </div>
+        
+        {showNewCommentButton && (
+          <Button onClick={() => setIsNewCommentOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Iniciar conversación
+          </Button>
+        )}
       </div>
+
+      {/* New Comment Dialog */}
+      <Dialog open={isNewCommentOpen} onOpenChange={setIsNewCommentOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Iniciar nueva conversación</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {programas.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Programa</label>
+                <Select value={newCommentPrograma} onValueChange={setNewCommentPrograma}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar programa" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {programas.map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Clase</label>
+              <Select value={newCommentClase} onValueChange={setNewCommentClase}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar clase" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clasesForPrograma.map(c => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.modulo && <span className="text-muted-foreground">{c.modulo} › </span>}
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Mensaje</label>
+              <Textarea
+                value={newCommentContent}
+                onChange={(e) => setNewCommentContent(e.target.value)}
+                placeholder="Escribe tu mensaje para iniciar la conversación..."
+                rows={4}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsNewCommentOpen(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleNewComment}
+              disabled={!newCommentClase || !newCommentContent.trim()}
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Publicar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Comments list */}
       <div className="space-y-4">
