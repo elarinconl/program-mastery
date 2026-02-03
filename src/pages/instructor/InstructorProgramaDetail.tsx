@@ -46,6 +46,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
+import { RubricaEditor } from '@/components/education/RubricaEditor';
+import { ExamenFinalEditor } from '@/components/education/ExamenFinalEditor';
 
 // Mock data
 const mockPrograma = {
@@ -462,94 +464,34 @@ export function InstructorProgramaDetail() {
 
           {/* Evaluación Final Tab */}
           <TabsContent value="evaluacion">
-            <div className="bg-card border border-border rounded-xl p-6">
-              <h3 className="font-semibold text-foreground mb-6">Consigna de Evaluación Final</h3>
-              
-              <div className="space-y-4 mb-6">
-                <div>
-                  <Label className="text-muted-foreground mb-2 block">Objetivo</Label>
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground">
-                      Identificar y marcar en un gráfico real los conceptos fundamentales aprendidos durante el programa.
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-muted-foreground mb-2 block">Instrucciones</Label>
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                      <li>Descarga el gráfico disponible en la plataforma.</li>
-                      <li>Ábrelo en una herramienta simple de edición de imágenes.</li>
-                      <li>Marca directamente sobre el gráfico los elementos aprendidos.</li>
-                    </ol>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label className="text-muted-foreground mb-2 block">Formato de Entrega</Label>
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground">
-                      PDF con la imagen del gráfico marcado + texto breve (máximo 150 palabras) describiendo lo observado.
-                    </p>
-                    <p className="text-sm font-medium mt-2">Nombre del archivo: TrabajoFinal_AT_ApellidoNombre.pdf</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-border pt-6">
-                <h4 className="font-medium mb-4">Configuración</h4>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground">Reintentos permitidos</p>
-                    <p className="font-medium">2</p>
-                  </div>
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground">Umbral de aprobación</p>
-                    <p className="font-medium">6/10</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ExamenFinalEditor
+              config={{
+                objetivo: 'Identificar y marcar en un gráfico real los conceptos fundamentales aprendidos durante el programa.',
+                instrucciones: '1. Descarga el gráfico disponible en la plataforma.\n2. Ábrelo en una herramienta simple de edición de imágenes.\n3. Marca directamente sobre el gráfico los elementos aprendidos.\n\nFormato: PDF con la imagen del gráfico marcado + texto breve (máximo 150 palabras) describiendo lo observado.\n\nNombre del archivo: TrabajoFinal_AT_ApellidoNombre.pdf',
+                formatoEntrega: 'pdf',
+                umbralAprobacion: 6,
+              }}
+              onSave={(config) => console.log('Examen config saved:', config)}
+            />
           </TabsContent>
 
           {/* Rúbrica Tab */}
           <TabsContent value="rubrica">
             <div className="bg-card border border-border rounded-xl p-6">
               <h3 className="font-semibold text-foreground mb-6">Rúbrica de Evaluación</h3>
-
-              <div className="space-y-6">
-                {programa.competencias.map((comp) => (
-                  <div key={comp.id} className="border border-border rounded-lg overflow-hidden">
-                    <div className="bg-muted/50 p-4 flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">{comp.name}</h4>
-                      </div>
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                        Peso: {comp.peso}%
-                      </Badge>
-                    </div>
-                    <div className="p-4">
-                      <div className="grid grid-cols-4 gap-4">
-                        {comp.niveles.map((nivel) => (
-                          <div key={nivel.nivel} className="p-3 bg-muted/30 rounded-lg">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="bg-primary text-primary-foreground text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
-                                {nivel.nivel}
-                              </span>
-                              <span className="text-sm font-medium">
-                                Nivel {nivel.nivel} ({comp.scorePerLevel[nivel.nivel as keyof typeof comp.scorePerLevel]} pts)
-                              </span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">{nivel.descripcion}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
+              <RubricaEditor
+                competencias={programa.competencias.map(comp => ({
+                  id: comp.id,
+                  name: comp.name,
+                  peso: comp.peso,
+                  niveles: comp.niveles.map((n, i) => ({
+                    nivel: n.nivel,
+                    descripcion: n.descripcion,
+                    puntaje: comp.scorePerLevel[(i + 1) as keyof typeof comp.scorePerLevel] || (i + 1) * 2.5,
+                  })),
+                }))}
+                onSave={(competencias) => console.log('Rubrica saved:', competencias)}
+              />
               <div className="mt-6 p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground">
                   <strong>Nota:</strong> El resultado final del programa será un promedio ponderado (máximo 10) basado en los pesos de cada competencia.

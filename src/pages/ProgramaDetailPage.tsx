@@ -52,6 +52,8 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { cn } from '@/lib/utils';
+import { RubricaEditor } from '@/components/education/RubricaEditor';
+import { ExamenFinalEditor } from '@/components/education/ExamenFinalEditor';
 
 // Mock data
 const mockPrograma = {
@@ -499,121 +501,37 @@ export function ProgramaDetailPage() {
 
           {/* Evaluación Final Tab */}
           <TabsContent value="evaluacion">
-            <div className="bg-card border border-border rounded-xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-semibold text-foreground">Consigna de Evaluación Final</h3>
-                <Button variant="outline" size="sm">
-                  <Edit className="w-4 h-4 mr-2" />
-                  Editar
-                </Button>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <Label className="text-muted-foreground mb-2 block">Objetivo (ES)</Label>
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="font-medium mb-2">Objetivo:</p>
-                    <p className="text-sm text-muted-foreground">
-                      Identificar y marcar en un gráfico real los conceptos fundamentales aprendidos durante el programa.
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground mb-2 block">Objective (EN)</Label>
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="font-medium mb-2">Objective:</p>
-                    <p className="text-sm text-muted-foreground">
-                      Identify and mark on a real chart the fundamental concepts learned during the program.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-border pt-6">
-                <Label className="text-muted-foreground mb-2 block">Instrucciones Completas (ES)</Label>
-                <div className="bg-muted/50 rounded-lg p-4 mb-4">
-                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                    <li>Descarga el gráfico disponible en la plataforma.</li>
-                    <li>Ábrelo en una herramienta simple de edición de imágenes.</li>
-                    <li>Marca directamente sobre el gráfico los elementos aprendidos.</li>
-                  </ol>
-                </div>
-                
-                <Label className="text-muted-foreground mb-2 block mt-4">Formato de Entrega</Label>
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <p className="text-sm text-muted-foreground">
-                    PDF con la imagen del gráfico marcado + texto breve (máximo 150 palabras) describiendo lo observado.
-                  </p>
-                  <p className="text-sm font-medium mt-2">Nombre del archivo: TrabajoFinal_AT_ApellidoNombre.pdf</p>
-                </div>
-              </div>
-
-              <div className="border-t border-border pt-6 mt-6">
-                <h4 className="font-medium mb-4">Configuración</h4>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label>Reintentos permitidos</Label>
-                    <Input type="number" defaultValue={2} className="mt-1" />
-                  </div>
-                  <div>
-                    <Label>Umbral de aprobación (1-10)</Label>
-                    <Input type="number" defaultValue={6} min={1} max={10} className="mt-1" />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ExamenFinalEditor
+              config={{
+                objetivo: 'Identificar y marcar en un gráfico real los conceptos fundamentales aprendidos durante el programa.',
+                instrucciones: '1. Descarga el gráfico disponible en la plataforma.\n2. Ábrelo en una herramienta simple de edición de imágenes.\n3. Marca directamente sobre el gráfico los elementos aprendidos.\n\nFormato: PDF con la imagen del gráfico marcado + texto breve (máximo 150 palabras) describiendo lo observado.\n\nNombre del archivo: TrabajoFinal_AT_ApellidoNombre.pdf',
+                formatoEntrega: 'pdf',
+                umbralAprobacion: 6,
+              }}
+              onSave={(config) => console.log('Examen config saved:', config)}
+            />
           </TabsContent>
 
           {/* Rúbrica Tab */}
           <TabsContent value="rubrica">
             <div className="bg-card border border-border rounded-xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-semibold text-foreground">Rúbrica de Evaluación</h3>
-                <Button variant="outline" size="sm">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nueva Competencia
-                </Button>
-              </div>
-
-              <div className="space-y-6">
-                {programa.competencias.map((comp) => (
-                  <div key={comp.id} className="border border-border rounded-lg overflow-hidden">
-                    <div className="bg-muted/50 p-4 flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">{comp.name}</h4>
-                        <p className="text-sm text-muted-foreground">{comp.nameEn}</p>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                          Peso: {comp.peso}%
-                        </Badge>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <div className="grid grid-cols-4 gap-4">
-                        {comp.niveles.map((nivel) => (
-                          <div key={nivel.nivel} className="p-3 bg-muted/30 rounded-lg">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="bg-primary text-primary-foreground text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
-                                {nivel.nivel}
-                              </span>
-                              <span className="text-sm font-medium">Nivel {nivel.nivel}</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">{nivel.descripcion}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
+              <h3 className="font-semibold text-foreground mb-6">Rúbrica de Evaluación</h3>
+              <RubricaEditor
+                competencias={programa.competencias.map(comp => ({
+                  id: comp.id,
+                  name: comp.name,
+                  peso: comp.peso,
+                  niveles: comp.niveles.map((n, i) => ({
+                    nivel: n.nivel,
+                    descripcion: n.descripcion,
+                    puntaje: [2.5, 5, 7.5, 10][i] || n.nivel * 2.5,
+                  })),
+                }))}
+                onSave={(competencias) => console.log('Rubrica saved:', competencias)}
+              />
               <div className="mt-6 p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  <strong>Nota:</strong> El resultado final del programa será un promedio ponderado (1-10) basado en los pesos de cada competencia.
+                  <strong>Nota:</strong> El resultado final del programa será un promedio ponderado (máximo 10) basado en los pesos de cada competencia.
                 </p>
               </div>
             </div>

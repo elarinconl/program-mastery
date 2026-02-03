@@ -134,12 +134,10 @@ export function ProgramasPage() {
               }
             </p>
           </div>
-          {!isInstructor && (
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Nuevo Programa
-            </Button>
-          )}
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Nuevo Programa
+          </Button>
         </div>
 
         {/* Filters */}

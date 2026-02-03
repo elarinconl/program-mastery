@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Layers,
   Route,
+  Edit,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -26,7 +27,7 @@ export function InstructorEducacionPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-foreground">Educación</h1>
-          <p className="text-muted-foreground">Vista general del contenido educativo (solo lectura)</p>
+          <p className="text-muted-foreground">Gestiona el contenido educativo - puedes editar fases, rutas, programas y clases</p>
         </div>
 
         {/* Stats */}
@@ -68,62 +69,74 @@ export function InstructorEducacionPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link to="/instructor/educacion/fases">
             <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all hover:border-primary/50">
-              <Layers className="w-8 h-8 text-primary mb-4" />
+              <div className="flex items-center justify-between mb-4">
+                <Layers className="w-8 h-8 text-primary" />
+                <Edit className="w-4 h-4 text-muted-foreground" />
+              </div>
               <h3 className="font-semibold text-foreground mb-2">Fases</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Ver la estructura de fases del contenido
+                Editar la estructura de fases del contenido
               </p>
               <span className="text-sm text-primary flex items-center gap-1">
-                Ver fases <ArrowRight className="w-4 h-4" />
+                Gestionar fases <ArrowRight className="w-4 h-4" />
               </span>
             </div>
           </Link>
 
           <Link to="/instructor/educacion/rutas">
             <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all hover:border-primary/50">
-              <Route className="w-8 h-8 text-blue-600 mb-4" />
+              <div className="flex items-center justify-between mb-4">
+                <Route className="w-8 h-8 text-blue-600" />
+                <Edit className="w-4 h-4 text-muted-foreground" />
+              </div>
               <h3 className="font-semibold text-foreground mb-2">Rutas</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Explorar las rutas de aprendizaje
+                Editar las rutas de aprendizaje
               </p>
               <span className="text-sm text-primary flex items-center gap-1">
-                Ver rutas <ArrowRight className="w-4 h-4" />
+                Gestionar rutas <ArrowRight className="w-4 h-4" />
               </span>
             </div>
           </Link>
 
           <Link to="/instructor/educacion/programas">
             <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all hover:border-primary/50">
-              <BookOpen className="w-8 h-8 text-purple-600 mb-4" />
+              <div className="flex items-center justify-between mb-4">
+                <BookOpen className="w-8 h-8 text-purple-600" />
+                <Edit className="w-4 h-4 text-muted-foreground" />
+              </div>
               <h3 className="font-semibold text-foreground mb-2">Programas</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Ver todos los programas disponibles
+                Editar todos los programas disponibles
               </p>
               <span className="text-sm text-primary flex items-center gap-1">
-                Ver programas <ArrowRight className="w-4 h-4" />
+                Gestionar programas <ArrowRight className="w-4 h-4" />
               </span>
             </div>
           </Link>
 
           <Link to="/instructor/educacion/clases">
             <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all hover:border-primary/50">
-              <Video className="w-8 h-8 text-amber-600 mb-4" />
+              <div className="flex items-center justify-between mb-4">
+                <Video className="w-8 h-8 text-amber-600" />
+                <Edit className="w-4 h-4 text-muted-foreground" />
+              </div>
               <h3 className="font-semibold text-foreground mb-2">Clases</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Explorar todas las clases y actividades
+                Editar clases y agregar actividades
               </p>
               <span className="text-sm text-primary flex items-center gap-1">
-                Ver clases <ArrowRight className="w-4 h-4" />
+                Gestionar clases <ArrowRight className="w-4 h-4" />
               </span>
             </div>
           </Link>
         </div>
 
         {/* Info Banner */}
-        <div className="mt-8 p-4 bg-muted/50 rounded-lg border border-border">
-          <p className="text-sm text-muted-foreground">
-            <strong>Nota:</strong> Como instructor, tienes acceso de solo lectura a la estructura educativa.
-            Para editar contenido, accede a "Mis Programas" donde podrás gestionar los programas asignados.
+        <div className="mt-8 p-4 bg-primary/5 rounded-lg border border-primary/20">
+          <p className="text-sm text-foreground">
+            <strong>💡 Tip:</strong> Como instructor, puedes editar el contenido de fases, rutas, programas y clases. 
+            También puedes crear nuevas actividades dentro de las clases para enriquecer el contenido educativo.
           </p>
         </div>
       </div>
