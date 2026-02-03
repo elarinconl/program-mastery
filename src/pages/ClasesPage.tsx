@@ -437,7 +437,10 @@ export function ClasesPage() {
           <p className="text-sm text-muted-foreground">
             {totalClases} clase(s) encontrada(s)
           </p>
-          {isSuperAdmin && <CreateClaseDialog />}
+          <div className="flex gap-2">
+            <CreateClaseDialog />
+            <CreateClaseDialog isActivity />
+          </div>
         </div>
 
         {/* Clases list */}
