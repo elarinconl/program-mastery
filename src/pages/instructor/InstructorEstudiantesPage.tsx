@@ -96,6 +96,21 @@ const mockEstudiantes: Estudiante[] = [
     programa: 'Gestión de Riesgo',
     programaId: 'p2',
   },
+  {
+    id: '4',
+    name: 'Ana Rodríguez',
+    email: 'ana@email.com',
+    pais: 'Colombia',
+    tier: 'pro',
+    registro: '2024-01-12',
+    avance: 60,
+    moduloActual: 'Fundamentos',
+    claseActual: 'Teoría de Dow',
+    estadoExamen: 'rejected',
+    estadoCert: 'pending',
+    programa: 'Fundamentos del Análisis Técnico',
+    programaId: 'p1',
+  },
 ];
 
 const mockProgramas = [
@@ -123,7 +138,7 @@ export function InstructorEstudiantesPage() {
   });
 
   return (
-    <MainLayout breadcrumbs={[{ label: 'instructor' }, { label: 'estudiantes' }]}>
+    <MainLayout breadcrumbs={[{ label: 'my workspace' }, { label: 'estudiantes' }]}>
       <div className="max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -174,6 +189,7 @@ export function InstructorEstudiantesPage() {
                 <TableHead>Programa</TableHead>
                 <TableHead>Avance</TableHead>
                 <TableHead>Módulo Actual</TableHead>
+                <TableHead>Clase Actual</TableHead>
                 <TableHead>Examen</TableHead>
                 <TableHead>Certificación</TableHead>
                 <TableHead className="w-12"></TableHead>
@@ -194,7 +210,7 @@ export function InstructorEstudiantesPage() {
                       {est.tier.charAt(0).toUpperCase() + est.tier.slice(1)}
                     </Badge>
                   </TableCell>
-                  <TableCell className="max-w-[200px]">
+                  <TableCell className="max-w-[180px]">
                     <p className="truncate text-sm">{est.programa}</p>
                   </TableCell>
                   <TableCell>
@@ -204,10 +220,10 @@ export function InstructorEstudiantesPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div>
-                      <p className="text-sm">{est.moduloActual}</p>
-                      <p className="text-xs text-muted-foreground">{est.claseActual}</p>
-                    </div>
+                    <p className="text-sm">{est.moduloActual}</p>
+                  </TableCell>
+                  <TableCell>
+                    <p className="text-sm text-muted-foreground">{est.claseActual}</p>
                   </TableCell>
                   <TableCell>
                     <Badge 

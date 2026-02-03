@@ -6,6 +6,9 @@ import {
   Send,
   Flag,
   CheckCircle,
+  BookOpen,
+  Video,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +30,7 @@ interface Comentario {
   studentEmail: string;
   programa: string;
   programaId: string;
+  modulo: string;
   clase: string;
   claseId: string;
   content: string;
@@ -50,9 +54,10 @@ const mockComentarios: Comentario[] = [
     studentEmail: 'ana@email.com',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
+    modulo: 'Módulo 1: Fundamentos',
     clase: 'Teoría de Dow',
     claseId: 'c1',
-    content: '¿Podrían explicar más sobre los principios de Dow? No me queda claro cómo aplicarlo en la práctica.',
+    content: '¿Podrían explicar más sobre los principios de Dow? No me queda claro cómo aplicarlo en la práctica. Especialmente el principio de confirmación entre índices.',
     date: '2024-01-15 10:30',
     status: 'open',
     replies: [],
@@ -63,16 +68,17 @@ const mockComentarios: Comentario[] = [
     studentEmail: 'pedro@email.com',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
+    modulo: 'Módulo 2: Patrones',
     clase: 'Patrones de velas',
     claseId: 'c2',
-    content: 'Excelente explicación del hammer y doji. ¿Podrían agregar más ejemplos de patrones de reversión?',
+    content: 'Excelente explicación del hammer y doji. ¿Podrían agregar más ejemplos de patrones de reversión? Me gustaría ver ejemplos en diferentes timeframes.',
     date: '2024-01-14 15:20',
     status: 'resolved',
     replies: [
       {
         id: 'r1',
         author: 'Instructor Carlos',
-        content: '¡Gracias por tu comentario! Agregaremos más ejemplos pronto.',
+        content: '¡Gracias por tu comentario! Agregaremos más ejemplos en diferentes timeframes pronto. Por ahora, te recomiendo revisar los gráficos de 4H y diario para identificar estos patrones.',
         date: '2024-01-14 16:45',
         isInstructor: true,
       },
@@ -84,10 +90,25 @@ const mockComentarios: Comentario[] = [
     studentEmail: 'carmen@email.com',
     programa: 'Gestión de Riesgo',
     programaId: 'p2',
+    modulo: 'Módulo 1: Fundamentos de Riesgo',
     clase: 'Cálculo de posición',
     claseId: 'c3',
-    content: '¿Cuál es la diferencia entre una orden limit y una stop limit?',
+    content: '¿Cuál es la diferencia entre una orden limit y una stop limit? En el video se mencionan pero no queda clara la diferencia práctica.',
     date: '2024-01-12 14:00',
+    status: 'open',
+    replies: [],
+  },
+  {
+    id: '4',
+    studentName: 'Luis García',
+    studentEmail: 'luis@email.com',
+    programa: 'Fundamentos del Análisis Técnico',
+    programaId: 'p1',
+    modulo: 'Módulo 3: Indicadores',
+    clase: 'Medias Móviles',
+    claseId: 'c4',
+    content: '¿Es mejor usar EMA o SMA para identificar tendencias? El video menciona ambas pero no explica cuándo usar cada una.',
+    date: '2024-01-16 09:15',
     status: 'open',
     replies: [],
   },
@@ -99,12 +120,17 @@ const mockProgramas = [
 ];
 
 const mockClases = [
-  { id: 'c1', name: 'Teoría de Dow', programaId: 'p1' },
-  { id: 'c2', name: 'Patrones de velas', programaId: 'p1' },
-  { id: 'c3', name: 'Cálculo de posición', programaId: 'p2' },
+  { id: 'c1', name: 'Teoría de Dow', programaId: 'p1', modulo: 'Módulo 1' },
+  { id: 'c2', name: 'Patrones de velas', programaId: 'p1', modulo: 'Módulo 2' },
+  { id: 'c3', name: 'Cálculo de posición', programaId: 'p2', modulo: 'Módulo 1' },
+  { id: 'c4', name: 'Medias Móviles', programaId: 'p1', modulo: 'Módulo 3' },
 ];
 
-function CommentCard({ comentario, onReply }: { comentario: Comentario; onReply: (id: string, reply: string) => void }) {
+function CommentCard({ comentario, onReply, onMarkResolved }: { 
+  comentario: Comentario; 
+  onReply: (id: string, reply: string) => void;
+  onMarkResolved: (id: string) => void;
+}) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
 
@@ -125,6 +151,17 @@ function CommentCard({ comentario, onReply }: { comentario: Comentario; onReply:
         comentario.status === 'resolved' && 'border-border'
       )}
     >
+      {/* Location Badge - Programa > Módulo > Clase */}
+      <div className="flex items-center gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
+        <BookOpen className="w-4 h-4 text-primary" />
+        <span className="text-sm font-medium text-primary">{comentario.programa}</span>
+        <ChevronRight className="w-3 h-3 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">{comentario.modulo}</span>
+        <ChevronRight className="w-3 h-3 text-muted-foreground" />
+        <Video className="w-3 h-3 text-muted-foreground" />
+        <span className="text-sm font-medium">{comentario.clase}</span>
+      </div>
+
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-3">
@@ -139,11 +176,7 @@ function CommentCard({ comentario, onReply }: { comentario: Comentario; onReply:
               <span className="text-sm text-muted-foreground">•</span>
               <span className="text-sm text-muted-foreground">{comentario.date}</span>
             </div>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge variant="outline" className="text-xs">{comentario.programa}</Badge>
-              <span className="text-xs text-muted-foreground">→</span>
-              <span className="text-xs text-muted-foreground">{comentario.clase}</span>
-            </div>
+            <span className="text-sm text-muted-foreground">{comentario.studentEmail}</span>
           </div>
         </div>
         <Badge 
@@ -220,7 +253,12 @@ function CommentCard({ comentario, onReply }: { comentario: Comentario; onReply:
           Responder
         </Button>
         {comentario.status === 'open' && (
-          <Button variant="outline" size="sm" className="text-success">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-success"
+            onClick={() => onMarkResolved(comentario.id)}
+          >
             <CheckCircle className="w-4 h-4 mr-2" />
             Marcar resuelto
           </Button>
@@ -268,7 +306,13 @@ export function InstructorComentariosPage() {
             id: `r${Date.now()}`,
             author: 'Instructor',
             content: reply,
-            date: new Date().toISOString().split('T')[0],
+            date: new Date().toLocaleString('es-ES', { 
+              year: 'numeric', 
+              month: '2-digit', 
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
             isInstructor: true,
           }],
         };
@@ -277,8 +321,17 @@ export function InstructorComentariosPage() {
     }));
   };
 
+  const handleMarkResolved = (id: string) => {
+    setComentarios(prev => prev.map(com => {
+      if (com.id === id) {
+        return { ...com, status: 'resolved' as const };
+      }
+      return com;
+    }));
+  };
+
   return (
-    <MainLayout breadcrumbs={[{ label: 'instructor' }, { label: 'comentarios' }]}>
+    <MainLayout breadcrumbs={[{ label: 'my workspace' }, { label: 'comentarios' }]}>
       <div className="max-w-4xl">
         {/* Header */}
         <div className="mb-6">
@@ -306,7 +359,7 @@ export function InstructorComentariosPage() {
           </div>
           <Select value={filterPrograma} onValueChange={(val) => {
             setFilterPrograma(val);
-            setFilterClase('all'); // Reset clase filter when programa changes
+            setFilterClase('all');
           }}>
             <SelectTrigger className="w-[220px]">
               <SelectValue placeholder="Filtrar por programa" />
@@ -352,6 +405,7 @@ export function InstructorComentariosPage() {
               key={comentario.id} 
               comentario={comentario}
               onReply={handleReply}
+              onMarkResolved={handleMarkResolved}
             />
           ))}
 

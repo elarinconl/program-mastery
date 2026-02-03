@@ -31,11 +31,11 @@ const mockPendingComments = [
 
 export function InstructorDashboard() {
   return (
-    <MainLayout breadcrumbs={[{ label: 'instructor' }, { label: 'dashboard' }]}>
+    <MainLayout breadcrumbs={[{ label: 'my workspace' }, { label: 'dashboard' }]}>
       <div className="max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground">Dashboard del Instructor</h1>
+          <h1 className="text-2xl font-bold text-foreground">My Workspace</h1>
           <p className="text-muted-foreground">Resumen de tu actividad y tareas pendientes</p>
         </div>
 

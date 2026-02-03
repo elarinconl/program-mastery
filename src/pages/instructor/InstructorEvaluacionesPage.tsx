@@ -5,6 +5,11 @@ import {
   Download,
   CheckCircle2,
   XCircle,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  History,
+  BookOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,11 +37,26 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
+
+interface SubmissionAttempt {
+  id: string;
+  attemptNumber: number;
+  submittedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+  score?: number;
+  feedback?: string;
+  fileUrl: string;
+}
 
 interface Submission {
   id: string;
@@ -44,10 +64,9 @@ interface Submission {
   studentEmail: string;
   programa: string;
   programaId: string;
-  submittedAt: string;
-  status: 'pending' | 'approved' | 'rejected';
-  score?: number;
-  fileUrl: string;
+  currentStatus: 'pending' | 'approved' | 'rejected';
+  currentScore?: number;
+  attempts: SubmissionAttempt[];
 }
 
 const mockSubmissions: Submission[] = [
@@ -57,9 +76,16 @@ const mockSubmissions: Submission[] = [
     studentEmail: 'carlos@email.com',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
-    submittedAt: '2024-01-15 14:30',
-    status: 'pending',
-    fileUrl: '/placeholder.pdf',
+    currentStatus: 'pending',
+    attempts: [
+      {
+        id: 'a1',
+        attemptNumber: 1,
+        submittedAt: '2024-01-15 14:30',
+        status: 'pending',
+        fileUrl: '/placeholder.pdf',
+      },
+    ],
   },
   {
     id: '2',
@@ -67,9 +93,43 @@ const mockSubmissions: Submission[] = [
     studentEmail: 'maria@email.com',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
-    submittedAt: '2024-01-14 09:15',
-    status: 'pending',
-    fileUrl: '/placeholder.pdf',
+    currentStatus: 'approved',
+    currentScore: 8.5,
+    attempts: [
+      {
+        id: 'a1',
+        attemptNumber: 1,
+        submittedAt: '2024-01-05 09:00',
+        status: 'rejected',
+        feedback: 'El análisis de patrones está incompleto. Falta identificar los gaps y no se mencionan los indicadores técnicos utilizados para confirmar las tendencias.',
+        fileUrl: '/placeholder_v1.pdf',
+      },
+      {
+        id: 'a2',
+        attemptNumber: 2,
+        submittedAt: '2024-01-08 11:30',
+        status: 'rejected',
+        feedback: 'Mejoraste en la identificación de gaps, pero el análisis de indicadores sigue siendo superficial. Necesitas explicar cómo el RSI y MACD confirman tus conclusiones.',
+        fileUrl: '/placeholder_v2.pdf',
+      },
+      {
+        id: 'a3',
+        attemptNumber: 3,
+        submittedAt: '2024-01-11 16:45',
+        status: 'rejected',
+        feedback: 'Buen progreso en indicadores, pero la estructura del documento es confusa. Organiza las secciones: 1) Identificación de patrones, 2) Análisis de indicadores, 3) Conclusiones.',
+        fileUrl: '/placeholder_v3.pdf',
+      },
+      {
+        id: 'a4',
+        attemptNumber: 4,
+        submittedAt: '2024-01-14 09:15',
+        status: 'approved',
+        score: 8.5,
+        feedback: '¡Excelente trabajo! El análisis está completo y bien estructurado. La identificación de patrones es precisa y los indicadores están correctamente aplicados.',
+        fileUrl: '/placeholder_v4.pdf',
+      },
+    ],
   },
   {
     id: '3',
@@ -77,10 +137,41 @@ const mockSubmissions: Submission[] = [
     studentEmail: 'juan@email.com',
     programa: 'Gestión de Riesgo',
     programaId: 'p2',
-    submittedAt: '2024-01-13 16:45',
-    status: 'approved',
-    score: 8.5,
-    fileUrl: '/placeholder.pdf',
+    currentStatus: 'rejected',
+    attempts: [
+      {
+        id: 'a1',
+        attemptNumber: 1,
+        submittedAt: '2024-01-10 10:00',
+        status: 'rejected',
+        feedback: 'El cálculo de posición es incorrecto. Revisa la fórmula de position sizing y vuelve a calcular con los parámetros dados.',
+        fileUrl: '/placeholder.pdf',
+      },
+      {
+        id: 'a2',
+        attemptNumber: 2,
+        submittedAt: '2024-01-13 16:45',
+        status: 'pending',
+        fileUrl: '/placeholder_v2.pdf',
+      },
+    ],
+  },
+  {
+    id: '4',
+    studentName: 'Ana Rodríguez',
+    studentEmail: 'ana@email.com',
+    programa: 'Fundamentos del Análisis Técnico',
+    programaId: 'p1',
+    currentStatus: 'pending',
+    attempts: [
+      {
+        id: 'a1',
+        attemptNumber: 1,
+        submittedAt: '2024-01-16 08:00',
+        status: 'pending',
+        fileUrl: '/placeholder.pdf',
+      },
+    ],
   },
 ];
 
@@ -128,6 +219,80 @@ const mockCompetencias = [
   },
 ];
 
+function HistoryDialog({ submission }: { submission: Submission }) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm" className="text-muted-foreground">
+          <History className="w-4 h-4 mr-1" />
+          {submission.attempts.length} intentos
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Historial de Intentos</DialogTitle>
+          <DialogDescription>
+            {submission.studentName} - {submission.programa}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          {submission.attempts.map((attempt, index) => (
+            <div 
+              key={attempt.id}
+              className={cn(
+                "border rounded-lg p-4",
+                attempt.status === 'approved' && "border-success/50 bg-success/5",
+                attempt.status === 'rejected' && "border-destructive/50 bg-destructive/5",
+                attempt.status === 'pending' && "border-warning/50 bg-warning/5"
+              )}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <span className="font-medium">Intento #{attempt.attemptNumber}</span>
+                  <Badge 
+                    variant="outline"
+                    className={cn(
+                      attempt.status === 'pending' && 'border-warning/50 bg-warning/10 text-warning',
+                      attempt.status === 'approved' && 'border-success/50 bg-success/10 text-success',
+                      attempt.status === 'rejected' && 'border-destructive/50 bg-destructive/10 text-destructive'
+                    )}
+                  >
+                    {attempt.status === 'pending' && 'Pendiente'}
+                    {attempt.status === 'approved' && 'Aprobado'}
+                    {attempt.status === 'rejected' && 'Rechazado'}
+                  </Badge>
+                  {attempt.score && (
+                    <span className="font-bold text-success">{attempt.score}/10</span>
+                  )}
+                </div>
+                <span className="text-sm text-muted-foreground">{attempt.submittedAt}</span>
+              </div>
+
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  TrabajoFinal_{submission.studentName.replace(' ', '_')}_v{attempt.attemptNumber}.pdf
+                </span>
+                <Button variant="ghost" size="sm" className="h-6 px-2">
+                  <Download className="w-3 h-3" />
+                </Button>
+              </div>
+
+              {attempt.feedback && (
+                <div className="bg-background rounded-lg p-3 border border-border">
+                  <p className="text-sm font-medium mb-1">Feedback del instructor:</p>
+                  <p className="text-sm text-muted-foreground">{attempt.feedback}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 interface EvaluationDialogProps {
   submission: Submission;
 }
@@ -136,6 +301,8 @@ function EvaluationDialog({ submission }: EvaluationDialogProps) {
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [feedback, setFeedback] = useState('');
   const [competencyScores, setCompetencyScores] = useState<Record<string, number>>({});
+
+  const currentAttempt = submission.attempts[submission.attempts.length - 1];
 
   const handleCompetencyScore = (compId: string, level: number) => {
     setCompetencyScores(prev => ({ ...prev, [compId]: level }));
@@ -168,16 +335,28 @@ function EvaluationDialog({ submission }: EvaluationDialogProps) {
         <DialogHeader>
           <DialogTitle>Evaluar Examen Final</DialogTitle>
           <DialogDescription>
-            {submission.studentName} - {submission.programa}
+            {submission.studentName} - {submission.programa} (Intento #{currentAttempt.attemptNumber})
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* Previous attempts warning */}
+          {submission.attempts.length > 1 && (
+            <div className="p-4 bg-warning/10 rounded-lg border border-warning/20">
+              <p className="text-sm font-medium text-warning">
+                Este estudiante ha tenido {submission.attempts.length - 1} intento(s) previo(s) rechazado(s).
+              </p>
+              <HistoryDialog submission={submission} />
+            </div>
+          )}
+
           {/* Download file */}
           <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
             <div>
               <p className="font-medium">Archivo del estudiante</p>
-              <p className="text-sm text-muted-foreground">TrabajoFinal_{submission.studentName.replace(' ', '_')}.pdf</p>
+              <p className="text-sm text-muted-foreground">
+                TrabajoFinal_{submission.studentName.replace(' ', '_')}_v{currentAttempt.attemptNumber}.pdf
+              </p>
             </div>
             <Button variant="outline">
               <Download className="w-4 h-4 mr-2" />
@@ -216,7 +395,7 @@ function EvaluationDialog({ submission }: EvaluationDialogProps) {
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
                 <h4 className="font-medium mb-2">Evaluación por Competencias</h4>
                 <p className="text-sm text-muted-foreground">
-                  Selecciona el nivel alcanzado para cada competencia. La calificación final se calcula automáticamente.
+                  Selecciona el nivel alcanzado para cada competencia.
                 </p>
               </div>
 
@@ -282,7 +461,7 @@ function EvaluationDialog({ submission }: EvaluationDialogProps) {
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               placeholder={isApproved === false 
-                ? "Explica los motivos del rechazo..."
+                ? "Explica los motivos del rechazo y qué debe mejorar..."
                 : "Comentarios adicionales (opcional)..."
               }
               className="mt-1"
@@ -319,15 +498,17 @@ export function InstructorEvaluacionesPage() {
   const filteredSubmissions = mockSubmissions.filter(sub => {
     const matchesSearch = sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       sub.programa.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || sub.status === filterStatus;
+    const matchesStatus = filterStatus === 'all' || sub.currentStatus === filterStatus;
     const matchesPrograma = filterPrograma === 'all' || sub.programaId === filterPrograma;
     return matchesSearch && matchesStatus && matchesPrograma;
   });
 
-  const pendingCount = mockSubmissions.filter(s => s.status === 'pending').length;
+  const pendingCount = mockSubmissions.filter(s => 
+    s.attempts.some(a => a.status === 'pending')
+  ).length;
 
   return (
-    <MainLayout breadcrumbs={[{ label: 'instructor' }, { label: 'evaluaciones' }]}>
+    <MainLayout breadcrumbs={[{ label: 'my workspace' }, { label: 'evaluaciones' }]}>
       <div className="max-w-7xl">
         {/* Header */}
         <div className="mb-6">
@@ -388,61 +569,75 @@ export function InstructorEvaluacionesPage() {
               <TableRow>
                 <TableHead>Estudiante</TableHead>
                 <TableHead>Programa</TableHead>
-                <TableHead>Fecha de Envío</TableHead>
+                <TableHead>Último Envío</TableHead>
+                <TableHead>Intentos</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Calificación</TableHead>
                 <TableHead>Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredSubmissions.map((sub) => (
-                <TableRow key={sub.id}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{sub.studentName}</p>
-                      <p className="text-sm text-muted-foreground">{sub.studentEmail}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>{sub.programa}</TableCell>
-                  <TableCell className="text-muted-foreground">{sub.submittedAt}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant="outline"
-                      className={cn(
-                        sub.status === 'pending' && 'border-warning/50 bg-warning/10 text-warning',
-                        sub.status === 'approved' && 'border-success/50 bg-success/10 text-success',
-                        sub.status === 'rejected' && 'border-destructive/50 bg-destructive/10 text-destructive'
+              {filteredSubmissions.map((sub) => {
+                const latestAttempt = sub.attempts[sub.attempts.length - 1];
+                const hasPendingAttempt = latestAttempt.status === 'pending';
+                
+                return (
+                  <TableRow key={sub.id}>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{sub.studentName}</p>
+                        <p className="text-sm text-muted-foreground">{sub.studentEmail}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <BookOpen className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm">{sub.programa}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{latestAttempt.submittedAt}</TableCell>
+                    <TableCell>
+                      <HistoryDialog submission={sub} />
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant="outline"
+                        className={cn(
+                          latestAttempt.status === 'pending' && 'border-warning/50 bg-warning/10 text-warning',
+                          latestAttempt.status === 'approved' && 'border-success/50 bg-success/10 text-success',
+                          latestAttempt.status === 'rejected' && 'border-destructive/50 bg-destructive/10 text-destructive'
+                        )}
+                      >
+                        {latestAttempt.status === 'pending' && 'Pendiente'}
+                        {latestAttempt.status === 'approved' && 'Aprobado'}
+                        {latestAttempt.status === 'rejected' && 'Rechazado'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {sub.currentScore ? (
+                        <span className={cn(
+                          'font-medium',
+                          sub.currentScore >= 6 ? 'text-success' : 'text-destructive'
+                        )}>
+                          {sub.currentScore}/10
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
                       )}
-                    >
-                      {sub.status === 'pending' && 'Pendiente'}
-                      {sub.status === 'approved' && 'Aprobado'}
-                      {sub.status === 'rejected' && 'Rechazado'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {sub.score ? (
-                      <span className={cn(
-                        'font-medium',
-                        sub.score >= 6 ? 'text-success' : 'text-destructive'
-                      )}>
-                        {sub.score}/10
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Download className="w-4 h-4" />
-                      </Button>
-                      {sub.status === 'pending' && (
-                        <EvaluationDialog submission={sub} />
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        {hasPendingAttempt && (
+                          <EvaluationDialog submission={sub} />
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
