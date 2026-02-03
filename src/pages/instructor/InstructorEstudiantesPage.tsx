@@ -1,12 +1,11 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import { useRole } from '@/contexts/RoleContext';
 import { useState } from 'react';
 import { 
   Search, 
   Filter, 
-  MoreHorizontal,
+  Download,
   Eye,
-  Download
+  MoreHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,8 +48,6 @@ interface Estudiante {
   estadoCert: 'pending' | 'issued';
   programa: string;
   programaId: string;
-  instructor: string;
-  instructorId: string;
 }
 
 const mockEstudiantes: Estudiante[] = [
@@ -68,8 +65,6 @@ const mockEstudiantes: Estudiante[] = [
     estadoCert: 'pending',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
-    instructor: 'Juan Martínez',
-    instructorId: 'i1',
   },
   {
     id: '2',
@@ -85,8 +80,6 @@ const mockEstudiantes: Estudiante[] = [
     estadoCert: 'pending',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
-    instructor: 'Juan Martínez',
-    instructorId: 'i1',
   },
   {
     id: '3',
@@ -100,40 +93,15 @@ const mockEstudiantes: Estudiante[] = [
     claseActual: 'Gaps',
     estadoExamen: 'pending',
     estadoCert: 'pending',
-    programa: 'Introducción a los Mercados',
+    programa: 'Gestión de Riesgo',
     programaId: 'p2',
-    instructor: 'Ana Rodríguez',
-    instructorId: 'i2',
-  },
-  {
-    id: '4',
-    name: 'Ana Martínez',
-    email: 'ana@email.com',
-    pais: 'Colombia',
-    tier: 'pro',
-    registro: '2024-01-15',
-    avance: 100,
-    moduloActual: 'Completado',
-    claseActual: '-',
-    estadoExamen: 'approved',
-    estadoCert: 'issued',
-    programa: 'Fundamentos del Análisis Técnico',
-    programaId: 'p1',
-    instructor: 'Juan Martínez',
-    instructorId: 'i1',
   },
 ];
 
 const mockProgramas = [
   { id: 'p1', name: 'Fundamentos del Análisis Técnico' },
-  { id: 'p2', name: 'Introducción a los Mercados' },
-  { id: 'p3', name: 'Gestión de Riesgo' },
-];
-
-const mockInstructores = [
-  { id: 'i1', name: 'Juan Martínez' },
-  { id: 'i2', name: 'Ana Rodríguez' },
-  { id: 'i3', name: 'Carlos Sánchez' },
+  { id: 'p2', name: 'Gestión de Riesgo' },
+  { id: 'p3', name: 'Introducción a los Mercados' },
 ];
 
 const tierColors = {
@@ -143,29 +111,26 @@ const tierColors = {
   premium: 'border-amber-200 bg-amber-50 text-amber-700',
 };
 
-export function EstudiantesPage() {
-  const { isInstructor, isSuperAdmin } = useRole();
+export function InstructorEstudiantesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPrograma, setFilterPrograma] = useState<string>('all');
-  const [filterInstructor, setFilterInstructor] = useState<string>('all');
 
   const filteredEstudiantes = mockEstudiantes.filter(est => {
     const matchesSearch = est.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       est.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesPrograma = filterPrograma === 'all' || est.programaId === filterPrograma;
-    const matchesInstructor = filterInstructor === 'all' || est.instructorId === filterInstructor;
-    return matchesSearch && matchesPrograma && matchesInstructor;
+    return matchesSearch && matchesPrograma;
   });
 
   return (
-    <MainLayout breadcrumbs={[{ label: 'gestión' }, { label: 'estudiantes' }]}>
+    <MainLayout breadcrumbs={[{ label: 'instructor' }, { label: 'estudiantes' }]}>
       <div className="max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Estudiantes</h1>
             <p className="text-muted-foreground">
-              Todos los estudiantes inscritos en la plataforma
+              Estudiantes inscritos en tus programas
             </p>
           </div>
           <Button variant="outline">
@@ -175,7 +140,7 @@ export function EstudiantesPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-6">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -185,8 +150,6 @@ export function EstudiantesPage() {
               className="pl-9"
             />
           </div>
-          
-          {/* Program Filter */}
           <Select value={filterPrograma} onValueChange={setFilterPrograma}>
             <SelectTrigger className="w-[280px]">
               <SelectValue placeholder="Filtrar por programa" />
@@ -198,21 +161,6 @@ export function EstudiantesPage() {
               ))}
             </SelectContent>
           </Select>
-
-          {/* Instructor Filter - Only for Superadmin */}
-          {isSuperAdmin && (
-            <Select value={filterInstructor} onValueChange={setFilterInstructor}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Filtrar por instructor" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos los instructores</SelectItem>
-                {mockInstructores.map(i => (
-                  <SelectItem key={i.id} value={i.id}>{i.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
         </div>
 
         {/* Table */}
@@ -224,7 +172,6 @@ export function EstudiantesPage() {
                 <TableHead>País</TableHead>
                 <TableHead>Plan</TableHead>
                 <TableHead>Programa</TableHead>
-                {isSuperAdmin && <TableHead>Instructor</TableHead>}
                 <TableHead>Avance</TableHead>
                 <TableHead>Módulo Actual</TableHead>
                 <TableHead>Examen</TableHead>
@@ -250,11 +197,6 @@ export function EstudiantesPage() {
                   <TableCell className="max-w-[200px]">
                     <p className="truncate text-sm">{est.programa}</p>
                   </TableCell>
-                  {isSuperAdmin && (
-                    <TableCell>
-                      <p className="text-sm">{est.instructor}</p>
-                    </TableCell>
-                  )}
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Progress value={est.avance} className="h-2 w-16" />
@@ -320,4 +262,4 @@ export function EstudiantesPage() {
   );
 }
 
-export default EstudiantesPage;
+export default InstructorEstudiantesPage;
