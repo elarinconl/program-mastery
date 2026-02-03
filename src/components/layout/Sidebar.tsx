@@ -40,11 +40,11 @@ const superadminNavItems: NavItem[] = [
 
 // Instructor navigation
 const instructorNavItems: NavItem[] = [
-  { label: 'Dashboard', href: '/instructor', icon: <Home className="w-5 h-5" />, section: 'INSTRUCTOR' },
+  { label: 'Dashboard', href: '/instructor', icon: <Home className="w-5 h-5" />, section: 'MY WORKSPACE' },
+  { label: 'Mis Programas', href: '/instructor/programas', icon: <BookOpen className="w-5 h-5" /> },
   { label: 'Estudiantes', href: '/instructor/estudiantes', icon: <Users className="w-5 h-5" /> },
   { label: 'Evaluaciones', href: '/instructor/evaluaciones', icon: <ClipboardCheck className="w-5 h-5" />, badge: 3 },
   { label: 'Comentarios', href: '/instructor/comentarios', icon: <MessageSquare className="w-5 h-5" />, badge: 8 },
-  { label: 'Mis Programas', href: '/instructor/programas', icon: <BookOpen className="w-5 h-5" />, section: 'MIS PROGRAMAS' },
   { label: 'Overview', href: '/instructor/educacion', icon: <LayoutDashboard className="w-5 h-5" />, section: 'EDUCACIÓN' },
   { label: 'Fases', href: '/instructor/educacion/fases', icon: <Layers className="w-5 h-5" /> },
   { label: 'Rutas', href: '/instructor/educacion/rutas', icon: <Route className="w-5 h-5" /> },
