@@ -6,7 +6,9 @@ import {
   BookOpen,
   Clock,
   Users,
-  Upload
+  Upload,
+  ChevronRight,
+  Layers,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +26,8 @@ const mockPrograma = {
   id: '1',
   name: 'Fundamentos del Análisis Técnico',
   description: 'Aprende los conceptos fundamentales del análisis técnico para operar en los mercados financieros.',
+  ruta: 'Análisis Técnico Básico',
+  fase: 'Fundamentación',
   duracion: '8h 30m',
   studentsCount: 342,
   tier: 'basic' as const,
@@ -288,29 +292,39 @@ export function InstructorProgramaDetail() {
         </Link>
 
         {/* Header */}
-        <div className="flex items-start gap-6 mb-8">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold text-foreground">{programa.name}</h1>
-              <Badge variant="outline" className={cn(tierColors[programa.tier])}>
-                {programa.tier.charAt(0).toUpperCase() + programa.tier.slice(1)}
-              </Badge>
-            </div>
-            <p className="text-muted-foreground mb-3">{programa.description}</p>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <BookOpen className="w-4 h-4" />
-                {programa.modulos.length} módulos
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                {programa.duracion}
-              </span>
-              <span className="flex items-center gap-1">
-                <Users className="w-4 h-4" />
-                {programa.studentsCount} estudiantes
-              </span>
-            </div>
+        <div className="bg-card border border-border rounded-xl p-6 mb-8">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+            <span className="font-medium text-primary">{programa.fase}</span>
+            <ChevronRight className="w-3 h-3" />
+            <span>{programa.ruta}</span>
+          </div>
+          
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-2xl font-bold text-foreground">{programa.name}</h1>
+            <Badge variant="outline" className={cn(tierColors[programa.tier])}>
+              {programa.tier.charAt(0).toUpperCase() + programa.tier.slice(1)}
+            </Badge>
+          </div>
+          
+          <p className="text-muted-foreground mb-4">{programa.description}</p>
+          
+          <div className="flex items-center gap-6 text-sm">
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <Layers className="w-4 h-4" />
+              <span className="font-medium text-foreground">{programa.modulos.length}</span> módulos
+            </span>
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <BookOpen className="w-4 h-4" />
+              <span className="font-medium text-foreground">{programa.clases.length}</span> clases
+            </span>
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <Clock className="w-4 h-4" />
+              <span className="font-medium text-foreground">{programa.duracion}</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <Users className="w-4 h-4" />
+              <span className="font-medium text-foreground">{programa.studentsCount}</span> estudiantes
+            </span>
           </div>
         </div>
 

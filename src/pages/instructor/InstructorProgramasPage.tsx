@@ -1,19 +1,28 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Link } from 'react-router-dom';
 import {
-  BookOpen,
   Clock,
   Users,
   Layers,
   ClipboardCheck,
   MessageSquare,
   ChevronRight,
+  Eye,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
-interface ProgramaCard {
+interface ProgramaRow {
   id: string;
   name: string;
   ruta: string;
@@ -28,7 +37,7 @@ interface ProgramaCard {
   avgProgress: number;
 }
 
-const mockProgramas: ProgramaCard[] = [
+const mockProgramas: ProgramaRow[] = [
   {
     id: '1',
     name: 'Fundamentos del Análisis Técnico',
@@ -104,107 +113,101 @@ export function InstructorProgramasPage() {
           <p className="text-muted-foreground">Programas asignados para gestionar</p>
         </div>
 
-        {/* Programs List */}
-        <div className="space-y-4">
-          {mockProgramas.map((programa) => (
-            <Link
-              key={programa.id}
-              to={`/instructor/programas/${programa.id}`}
-              className="block bg-card border border-border rounded-xl p-5 hover:shadow-lg transition-all hover:border-primary/50 group"
-            >
-              <div className="flex items-start justify-between gap-6">
-                {/* Left: Main info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors truncate">
-                      {programa.name}
-                    </h3>
-                    <Badge variant="outline" className={cn(tierColors[programa.tier])}>
-                      {programa.tier.charAt(0).toUpperCase() + programa.tier.slice(1)}
-                    </Badge>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                    <span>{programa.fase}</span>
-                    <ChevronRight className="w-3 h-3" />
-                    <span>{programa.ruta}</span>
-                  </div>
-
-                  <div className="grid grid-cols-4 gap-6 text-sm">
+        {/* Programs Table */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead className="font-semibold">Programa</TableHead>
+                <TableHead className="font-semibold">Fase / Ruta</TableHead>
+                <TableHead className="font-semibold text-center">Módulos</TableHead>
+                <TableHead className="font-semibold text-center">Clases</TableHead>
+                <TableHead className="font-semibold text-center">Duración</TableHead>
+                <TableHead className="font-semibold text-center">Estudiantes</TableHead>
+                <TableHead className="font-semibold">Pendientes</TableHead>
+                <TableHead className="font-semibold">Avance Prom.</TableHead>
+                <TableHead className="font-semibold text-center">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {mockProgramas.map((programa) => (
+                <TableRow key={programa.id} className="hover:bg-muted/30">
+                  <TableCell>
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 bg-muted rounded">
-                        <Layers className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Módulos</p>
-                        <p className="font-medium">{programa.modulosCount}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 bg-muted rounded">
-                        <BookOpen className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Clases</p>
-                        <p className="font-medium">{programa.clasesCount}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 bg-muted rounded">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Duración</p>
-                        <p className="font-medium">{programa.duration}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 bg-muted rounded">
-                        <Users className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Estudiantes</p>
-                        <p className="font-medium">{programa.studentsCount}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right: Stats and alerts */}
-                <div className="flex flex-col items-end gap-4 shrink-0">
-                  {/* Pending items */}
-                  <div className="flex items-center gap-3">
-                    {programa.pendingEvaluations > 0 && (
-                      <div className="flex items-center gap-1.5 text-warning">
-                        <ClipboardCheck className="w-4 h-4" />
-                        <span className="text-sm font-medium">{programa.pendingEvaluations} eval.</span>
-                      </div>
-                    )}
-                    {programa.pendingComments > 0 && (
-                      <div className="flex items-center gap-1.5 text-destructive">
-                        <MessageSquare className="w-4 h-4" />
-                        <span className="text-sm font-medium">{programa.pendingComments} com.</span>
-                      </div>
-                    )}
-                    {programa.pendingEvaluations === 0 && programa.pendingComments === 0 && (
-                      <Badge variant="outline" className="border-success/50 bg-success/10 text-success">
-                        Al día
+                      <span className="font-medium text-foreground">{programa.name}</span>
+                      <Badge variant="outline" className={cn('text-xs', tierColors[programa.tier])}>
+                        {programa.tier.charAt(0).toUpperCase() + programa.tier.slice(1)}
                       </Badge>
-                    )}
-                  </div>
-
-                  {/* Average progress */}
-                  <div className="w-40">
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="text-muted-foreground">Avance promedio</span>
-                      <span className="font-medium">{programa.avgProgress}%</span>
                     </div>
-                    <Progress value={programa.avgProgress} className="h-2" />
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">{programa.fase}</span>
+                      <ChevronRight className="w-3 h-3" />
+                      <span>{programa.ruta}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <Layers className="w-4 h-4 text-muted-foreground" />
+                      <span>{programa.modulosCount}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">{programa.clasesCount}</TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <Clock className="w-4 h-4 text-muted-foreground" />
+                      <span>{programa.duration}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <span>{programa.studentsCount}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      {programa.pendingEvaluations > 0 && (
+                        <div className="flex items-center gap-1 text-warning">
+                          <ClipboardCheck className="w-4 h-4" />
+                          <span className="text-sm font-medium">{programa.pendingEvaluations}</span>
+                        </div>
+                      )}
+                      {programa.pendingComments > 0 && (
+                        <div className="flex items-center gap-1 text-destructive">
+                          <MessageSquare className="w-4 h-4" />
+                          <span className="text-sm font-medium">{programa.pendingComments}</span>
+                        </div>
+                      )}
+                      {programa.pendingEvaluations === 0 && programa.pendingComments === 0 && (
+                        <Badge variant="outline" className="border-success/50 bg-success/10 text-success text-xs">
+                          Al día
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="w-28">
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="text-muted-foreground">Promedio</span>
+                        <span className="font-medium">{programa.avgProgress}%</span>
+                      </div>
+                      <Progress value={programa.avgProgress} className="h-1.5" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button asChild variant="ghost" size="sm">
+                      <Link to={`/instructor/programas/${programa.id}`}>
+                        <Eye className="w-4 h-4 mr-1.5" />
+                        Ver
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
     </MainLayout>
