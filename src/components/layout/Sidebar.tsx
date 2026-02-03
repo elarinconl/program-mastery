@@ -14,6 +14,7 @@ import {
   Settings,
   GraduationCap,
   Building2,
+  Home,
 } from 'lucide-react';
 
 interface NavItem {
@@ -21,31 +22,42 @@ interface NavItem {
   href: string;
   icon: React.ReactNode;
   badge?: number;
-  adminOnly?: boolean;
   section?: string;
 }
 
-const navItems: NavItem[] = [
+// Superadmin navigation
+const superadminNavItems: NavItem[] = [
   { label: 'Overview', href: '/', icon: <LayoutDashboard className="w-5 h-5" />, section: 'EDUCACIÓN' },
-  { label: 'Fases', href: '/fases', icon: <Layers className="w-5 h-5" />, adminOnly: true },
-  { label: 'Rutas', href: '/rutas', icon: <Route className="w-5 h-5" />, adminOnly: true },
+  { label: 'Fases', href: '/fases', icon: <Layers className="w-5 h-5" /> },
+  { label: 'Rutas', href: '/rutas', icon: <Route className="w-5 h-5" /> },
   { label: 'Programas', href: '/programas', icon: <BookOpen className="w-5 h-5" /> },
-  { label: 'Clases', href: '/clases', icon: <Video className="w-5 h-5" />, adminOnly: true },
+  { label: 'Clases', href: '/clases', icon: <Video className="w-5 h-5" /> },
   { label: 'Estudiantes', href: '/estudiantes', icon: <Users className="w-5 h-5" />, section: 'GESTIÓN' },
   { label: 'Evaluaciones', href: '/evaluaciones', icon: <ClipboardCheck className="w-5 h-5" />, badge: 5 },
   { label: 'Comentarios', href: '/comentarios', icon: <MessageSquare className="w-5 h-5" />, badge: 12 },
-  { label: 'Batch Upload', href: '/batch-upload', icon: <Upload className="w-5 h-5" />, adminOnly: true, section: 'HERRAMIENTAS' },
-  { label: 'Organizaciones', href: '/organizaciones', icon: <Building2 className="w-5 h-5" />, adminOnly: true },
+  { label: 'Batch Upload', href: '/batch-upload', icon: <Upload className="w-5 h-5" />, section: 'HERRAMIENTAS' },
+  { label: 'Organizaciones', href: '/organizaciones', icon: <Building2 className="w-5 h-5" /> },
+];
+
+// Instructor navigation
+const instructorNavItems: NavItem[] = [
+  { label: 'Dashboard', href: '/instructor', icon: <Home className="w-5 h-5" />, section: 'INSTRUCTOR' },
+  { label: 'Estudiantes', href: '/instructor/estudiantes', icon: <Users className="w-5 h-5" /> },
+  { label: 'Evaluaciones', href: '/instructor/evaluaciones', icon: <ClipboardCheck className="w-5 h-5" />, badge: 3 },
+  { label: 'Comentarios', href: '/instructor/comentarios', icon: <MessageSquare className="w-5 h-5" />, badge: 8 },
+  { label: 'Mis Programas', href: '/instructor/programas', icon: <BookOpen className="w-5 h-5" />, section: 'MIS PROGRAMAS' },
+  { label: 'Overview', href: '/instructor/educacion', icon: <LayoutDashboard className="w-5 h-5" />, section: 'EDUCACIÓN' },
+  { label: 'Fases', href: '/instructor/educacion/fases', icon: <Layers className="w-5 h-5" /> },
+  { label: 'Rutas', href: '/instructor/educacion/rutas', icon: <Route className="w-5 h-5" /> },
+  { label: 'Programas', href: '/instructor/educacion/programas', icon: <BookOpen className="w-5 h-5" /> },
+  { label: 'Clases', href: '/instructor/educacion/clases', icon: <Video className="w-5 h-5" /> },
 ];
 
 export function Sidebar() {
   const location = useLocation();
   const { isSuperAdmin, isInstructor } = useRole();
 
-  const filteredItems = navItems.filter(item => {
-    if (item.adminOnly && isInstructor) return false;
-    return true;
-  });
+  const navItems = isSuperAdmin ? superadminNavItems : instructorNavItems;
 
   let currentSection = '';
 
@@ -64,9 +76,12 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-4">
         <ul className="space-y-1">
-          {filteredItems.map((item) => {
+          {navItems.map((item) => {
             const showSection = item.section && item.section !== currentSection;
             if (item.section) currentSection = item.section;
+
+            const isActive = location.pathname === item.href || 
+              (item.href !== '/' && item.href !== '/instructor' && location.pathname.startsWith(item.href));
 
             return (
               <li key={item.href}>
@@ -79,7 +94,7 @@ export function Sidebar() {
                   to={item.href}
                   className={cn(
                     'nav-item',
-                    location.pathname === item.href && 'active'
+                    isActive && 'active'
                   )}
                 >
                   {item.icon}

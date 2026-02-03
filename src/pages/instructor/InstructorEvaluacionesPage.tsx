@@ -1,5 +1,4 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import { useRole } from '@/contexts/RoleContext';
 import { useState } from 'react';
 import { 
   Search, 
@@ -45,8 +44,6 @@ interface Submission {
   studentEmail: string;
   programa: string;
   programaId: string;
-  instructor: string;
-  instructorId: string;
   submittedAt: string;
   status: 'pending' | 'approved' | 'rejected';
   score?: number;
@@ -60,8 +57,6 @@ const mockSubmissions: Submission[] = [
     studentEmail: 'carlos@email.com',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
-    instructor: 'Juan Martínez',
-    instructorId: 'i1',
     submittedAt: '2024-01-15 14:30',
     status: 'pending',
     fileUrl: '/placeholder.pdf',
@@ -72,8 +67,6 @@ const mockSubmissions: Submission[] = [
     studentEmail: 'maria@email.com',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
-    instructor: 'Juan Martínez',
-    instructorId: 'i1',
     submittedAt: '2024-01-14 09:15',
     status: 'pending',
     fileUrl: '/placeholder.pdf',
@@ -82,40 +75,18 @@ const mockSubmissions: Submission[] = [
     id: '3',
     studentName: 'Juan Pérez',
     studentEmail: 'juan@email.com',
-    programa: 'Introducción a los Mercados',
+    programa: 'Gestión de Riesgo',
     programaId: 'p2',
-    instructor: 'Ana Rodríguez',
-    instructorId: 'i2',
     submittedAt: '2024-01-13 16:45',
     status: 'approved',
     score: 8.5,
-    fileUrl: '/placeholder.pdf',
-  },
-  {
-    id: '4',
-    studentName: 'Ana Martínez',
-    studentEmail: 'ana@email.com',
-    programa: 'Gestión de Riesgo',
-    programaId: 'p3',
-    instructor: 'Carlos Sánchez',
-    instructorId: 'i3',
-    submittedAt: '2024-01-12 11:20',
-    status: 'rejected',
-    score: 4.5,
     fileUrl: '/placeholder.pdf',
   },
 ];
 
 const mockProgramas = [
   { id: 'p1', name: 'Fundamentos del Análisis Técnico' },
-  { id: 'p2', name: 'Introducción a los Mercados' },
-  { id: 'p3', name: 'Gestión de Riesgo' },
-];
-
-const mockInstructores = [
-  { id: 'i1', name: 'Juan Martínez' },
-  { id: 'i2', name: 'Ana Rodríguez' },
-  { id: 'i3', name: 'Carlos Sánchez' },
+  { id: 'p2', name: 'Gestión de Riesgo' },
 ];
 
 const mockCompetencias = [
@@ -206,9 +177,7 @@ function EvaluationDialog({ submission }: EvaluationDialogProps) {
           <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
             <div>
               <p className="font-medium">Archivo del estudiante</p>
-              <p className="text-sm text-muted-foreground">
-                TrabajoFinal_{submission.studentName.replace(' ', '_')}.pdf
-              </p>
+              <p className="text-sm text-muted-foreground">TrabajoFinal_{submission.studentName.replace(' ', '_')}.pdf</p>
             </div>
             <Button variant="outline">
               <Download className="w-4 h-4 mr-2" />
@@ -306,15 +275,15 @@ function EvaluationDialog({ submission }: EvaluationDialogProps) {
             </div>
           )}
 
-          {/* Feedback (always shown) */}
+          {/* Feedback */}
           <div>
             <Label>Feedback General (Español)</Label>
             <Textarea
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               placeholder={isApproved === false 
-                ? "Explica los motivos del rechazo y qué debe mejorar el estudiante..."
-                : "Comentarios adicionales para el estudiante (opcional para aprobación)..."
+                ? "Explica los motivos del rechazo..."
+                : "Comentarios adicionales (opcional)..."
               }
               className="mt-1"
               rows={4}
@@ -334,7 +303,7 @@ function EvaluationDialog({ submission }: EvaluationDialogProps) {
               isApproved === false && 'bg-destructive hover:bg-destructive/90'
             )}
           >
-            {isApproved === true ? 'Aprobar Evaluación' : isApproved === false ? 'Rechazar Evaluación' : 'Guardar'}
+            {isApproved === true ? 'Aprobar' : isApproved === false ? 'Rechazar' : 'Guardar'}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -342,44 +311,39 @@ function EvaluationDialog({ submission }: EvaluationDialogProps) {
   );
 }
 
-export function EvaluacionesPage() {
-  const { isSuperAdmin } = useRole();
+export function InstructorEvaluacionesPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPrograma, setFilterPrograma] = useState<string>('all');
-  const [filterInstructor, setFilterInstructor] = useState<string>('all');
 
   const filteredSubmissions = mockSubmissions.filter(sub => {
     const matchesSearch = sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       sub.programa.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || sub.status === filterStatus;
+    const matchesStatus = filterStatus === 'all' || sub.status === filterStatus;
     const matchesPrograma = filterPrograma === 'all' || sub.programaId === filterPrograma;
-    const matchesInstructor = filterInstructor === 'all' || sub.instructorId === filterInstructor;
-    return matchesSearch && matchesFilter && matchesPrograma && matchesInstructor;
+    return matchesSearch && matchesStatus && matchesPrograma;
   });
 
   const pendingCount = mockSubmissions.filter(s => s.status === 'pending').length;
 
   return (
-    <MainLayout breadcrumbs={[{ label: 'gestión' }, { label: 'evaluaciones' }]}>
+    <MainLayout breadcrumbs={[{ label: 'instructor' }, { label: 'evaluaciones' }]}>
       <div className="max-w-7xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Evaluaciones
-              {pendingCount > 0 && (
-                <span className="ml-3 bg-destructive text-destructive-foreground text-sm px-2.5 py-1 rounded-full">
-                  {pendingCount} pendientes
-                </span>
-              )}
-            </h1>
-            <p className="text-muted-foreground">Todos los exámenes finales enviados</p>
-          </div>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground">
+            Evaluaciones
+            {pendingCount > 0 && (
+              <span className="ml-3 bg-destructive text-destructive-foreground text-sm px-2.5 py-1 rounded-full">
+                {pendingCount} pendientes
+              </span>
+            )}
+          </h1>
+          <p className="text-muted-foreground">Exámenes finales de tus estudiantes</p>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-6">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -389,8 +353,6 @@ export function EvaluacionesPage() {
               className="pl-9"
             />
           </div>
-          
-          {/* Program Filter */}
           <Select value={filterPrograma} onValueChange={setFilterPrograma}>
             <SelectTrigger className="w-[280px]">
               <SelectValue placeholder="Filtrar por programa" />
@@ -402,22 +364,6 @@ export function EvaluacionesPage() {
               ))}
             </SelectContent>
           </Select>
-
-          {/* Instructor Filter */}
-          {isSuperAdmin && (
-            <Select value={filterInstructor} onValueChange={setFilterInstructor}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Filtrar por instructor" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos los instructores</SelectItem>
-                {mockInstructores.map(i => (
-                  <SelectItem key={i.id} value={i.id}>{i.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
           <div className="flex gap-2">
             {(['all', 'pending', 'approved', 'rejected'] as const).map((status) => (
               <Button
@@ -442,7 +388,6 @@ export function EvaluacionesPage() {
               <TableRow>
                 <TableHead>Estudiante</TableHead>
                 <TableHead>Programa</TableHead>
-                {isSuperAdmin && <TableHead>Instructor</TableHead>}
                 <TableHead>Fecha de Envío</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Calificación</TableHead>
@@ -459,11 +404,6 @@ export function EvaluacionesPage() {
                     </div>
                   </TableCell>
                   <TableCell>{sub.programa}</TableCell>
-                  {isSuperAdmin && (
-                    <TableCell>
-                      <p className="text-sm">{sub.instructor}</p>
-                    </TableCell>
-                  )}
                   <TableCell className="text-muted-foreground">{sub.submittedAt}</TableCell>
                   <TableCell>
                     <Badge 
@@ -511,4 +451,4 @@ export function EvaluacionesPage() {
   );
 }
 
-export default EvaluacionesPage;
+export default InstructorEvaluacionesPage;

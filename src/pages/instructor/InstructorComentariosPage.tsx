@@ -1,5 +1,4 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import { useRole } from '@/contexts/RoleContext';
 import { useState } from 'react';
 import { 
   Search, 
@@ -7,7 +6,6 @@ import {
   Send,
   Flag,
   CheckCircle,
-  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,8 +27,6 @@ interface Comentario {
   studentEmail: string;
   programa: string;
   programaId: string;
-  instructor: string;
-  instructorId: string;
   clase: string;
   claseId: string;
   content: string;
@@ -54,8 +50,6 @@ const mockComentarios: Comentario[] = [
     studentEmail: 'ana@email.com',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
-    instructor: 'Juan Martínez',
-    instructorId: 'i1',
     clase: 'Teoría de Dow',
     claseId: 'c1',
     content: '¿Podrían explicar más sobre los principios de Dow? No me queda claro cómo aplicarlo en la práctica.',
@@ -69,8 +63,6 @@ const mockComentarios: Comentario[] = [
     studentEmail: 'pedro@email.com',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
-    instructor: 'Juan Martínez',
-    instructorId: 'i1',
     clase: 'Patrones de velas',
     claseId: 'c2',
     content: 'Excelente explicación del hammer y doji. ¿Podrían agregar más ejemplos de patrones de reversión?',
@@ -80,7 +72,7 @@ const mockComentarios: Comentario[] = [
       {
         id: 'r1',
         author: 'Instructor Carlos',
-        content: '¡Gracias por tu comentario! Efectivamente, agregaremos más ejemplos en la próxima actualización del curso.',
+        content: '¡Gracias por tu comentario! Agregaremos más ejemplos pronto.',
         date: '2024-01-14 16:45',
         isInstructor: true,
       },
@@ -88,29 +80,12 @@ const mockComentarios: Comentario[] = [
   },
   {
     id: '3',
-    studentName: 'Luis Rodríguez',
-    studentEmail: 'luis@email.com',
-    programa: 'Gestión de Riesgo',
-    programaId: 'p2',
-    instructor: 'Ana Rodríguez',
-    instructorId: 'i2',
-    clase: 'Cálculo de posición',
-    claseId: 'c3',
-    content: 'Este contenido es inapropiado y no tiene nada que ver con el tema.',
-    date: '2024-01-13 09:15',
-    status: 'reported',
-    replies: [],
-  },
-  {
-    id: '4',
     studentName: 'Carmen Ruiz',
     studentEmail: 'carmen@email.com',
-    programa: 'Introducción a los Mercados',
-    programaId: 'p3',
-    instructor: 'Carlos Sánchez',
-    instructorId: 'i3',
-    clase: 'Tipos de órdenes',
-    claseId: 'c4',
+    programa: 'Gestión de Riesgo',
+    programaId: 'p2',
+    clase: 'Cálculo de posición',
+    claseId: 'c3',
     content: '¿Cuál es la diferencia entre una orden limit y una stop limit?',
     date: '2024-01-12 14:00',
     status: 'open',
@@ -121,26 +96,17 @@ const mockComentarios: Comentario[] = [
 const mockProgramas = [
   { id: 'p1', name: 'Fundamentos del Análisis Técnico' },
   { id: 'p2', name: 'Gestión de Riesgo' },
-  { id: 'p3', name: 'Introducción a los Mercados' },
-];
-
-const mockInstructores = [
-  { id: 'i1', name: 'Juan Martínez' },
-  { id: 'i2', name: 'Ana Rodríguez' },
-  { id: 'i3', name: 'Carlos Sánchez' },
 ];
 
 const mockClases = [
   { id: 'c1', name: 'Teoría de Dow', programaId: 'p1' },
   { id: 'c2', name: 'Patrones de velas', programaId: 'p1' },
   { id: 'c3', name: 'Cálculo de posición', programaId: 'p2' },
-  { id: 'c4', name: 'Tipos de órdenes', programaId: 'p3' },
 ];
 
 function CommentCard({ comentario, onReply }: { comentario: Comentario; onReply: (id: string, reply: string) => void }) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
-  const { isSuperAdmin } = useRole();
 
   const handleSubmitReply = () => {
     if (replyText.trim()) {
@@ -173,16 +139,10 @@ function CommentCard({ comentario, onReply }: { comentario: Comentario; onReply:
               <span className="text-sm text-muted-foreground">•</span>
               <span className="text-sm text-muted-foreground">{comentario.date}</span>
             </div>
-            <div className="flex items-center gap-2 mt-1 flex-wrap">
+            <div className="flex items-center gap-2 mt-1">
               <Badge variant="outline" className="text-xs">{comentario.programa}</Badge>
               <span className="text-xs text-muted-foreground">→</span>
               <span className="text-xs text-muted-foreground">{comentario.clase}</span>
-              {isSuperAdmin && (
-                <>
-                  <span className="text-xs text-muted-foreground">|</span>
-                  <span className="text-xs text-primary">{comentario.instructor}</span>
-                </>
-              )}
             </div>
           </div>
         </div>
@@ -271,33 +231,18 @@ function CommentCard({ comentario, onReply }: { comentario: Comentario; onReply:
             Reportar
           </Button>
         )}
-        {comentario.status === 'reported' && isSuperAdmin && (
-          <>
-            <Button variant="outline" size="sm" className="text-success">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Aprobar
-            </Button>
-            <Button variant="outline" size="sm" className="text-destructive">
-              <AlertTriangle className="w-4 h-4 mr-2" />
-              Eliminar
-            </Button>
-          </>
-        )}
       </div>
     </div>
   );
 }
 
-export function ComentariosPage() {
-  const { isSuperAdmin } = useRole();
+export function InstructorComentariosPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'resolved' | 'reported'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'resolved'>('all');
   const [filterPrograma, setFilterPrograma] = useState<string>('all');
-  const [filterInstructor, setFilterInstructor] = useState<string>('all');
   const [filterClase, setFilterClase] = useState<string>('all');
   const [comentarios, setComentarios] = useState(mockComentarios);
 
-  // Get available classes based on selected program
   const availableClases = filterPrograma === 'all' 
     ? mockClases 
     : mockClases.filter(c => c.programaId === filterPrograma);
@@ -308,16 +253,11 @@ export function ComentariosPage() {
       com.clase.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = filterStatus === 'all' || com.status === filterStatus;
     const matchesPrograma = filterPrograma === 'all' || com.programaId === filterPrograma;
-    const matchesInstructor = filterInstructor === 'all' || com.instructorId === filterInstructor;
     const matchesClase = filterClase === 'all' || com.claseId === filterClase;
-    // Si es instructor, solo mostrar sus programas (simulado)
-    // Si es superadmin y filtro es "reported", mostrar reportados
-    if (filterStatus === 'reported' && !isSuperAdmin) return false;
-    return matchesSearch && matchesStatus && matchesPrograma && matchesInstructor && matchesClase;
+    return matchesSearch && matchesStatus && matchesPrograma && matchesClase;
   });
 
   const openCount = comentarios.filter(c => c.status === 'open').length;
-  const reportedCount = comentarios.filter(c => c.status === 'reported').length;
 
   const handleReply = (id: string, reply: string) => {
     setComentarios(prev => prev.map(com => {
@@ -326,10 +266,10 @@ export function ComentariosPage() {
           ...com,
           replies: [...com.replies, {
             id: `r${Date.now()}`,
-            author: 'Admin',
+            author: 'Instructor',
             content: reply,
             date: new Date().toISOString().split('T')[0],
-            isInstructor: false,
+            isInstructor: true,
           }],
         };
       }
@@ -338,26 +278,19 @@ export function ComentariosPage() {
   };
 
   return (
-    <MainLayout breadcrumbs={[{ label: 'gestión' }, { label: 'comentarios' }]}>
+    <MainLayout breadcrumbs={[{ label: 'instructor' }, { label: 'comentarios' }]}>
       <div className="max-w-4xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Comentarios
-              {openCount > 0 && (
-                <span className="ml-3 bg-warning text-warning-foreground text-sm px-2.5 py-1 rounded-full">
-                  {openCount} abiertos
-                </span>
-              )}
-              {isSuperAdmin && reportedCount > 0 && (
-                <span className="ml-2 bg-destructive text-destructive-foreground text-sm px-2.5 py-1 rounded-full">
-                  {reportedCount} reportados
-                </span>
-              )}
-            </h1>
-            <p className="text-muted-foreground">Todos los comentarios de la plataforma</p>
-          </div>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground">
+            Comentarios
+            {openCount > 0 && (
+              <span className="ml-3 bg-warning text-warning-foreground text-sm px-2.5 py-1 rounded-full">
+                {openCount} abiertos
+              </span>
+            )}
+          </h1>
+          <p className="text-muted-foreground">Comentarios en tus clases y programas</p>
         </div>
 
         {/* Filters */}
@@ -371,8 +304,6 @@ export function ComentariosPage() {
               className="pl-9"
             />
           </div>
-          
-          {/* Program Filter */}
           <Select value={filterPrograma} onValueChange={(val) => {
             setFilterPrograma(val);
             setFilterClase('all'); // Reset clase filter when programa changes
@@ -387,8 +318,6 @@ export function ComentariosPage() {
               ))}
             </SelectContent>
           </Select>
-
-          {/* Clase Filter */}
           <Select value={filterClase} onValueChange={setFilterClase}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Filtrar por clase" />
@@ -400,34 +329,17 @@ export function ComentariosPage() {
               ))}
             </SelectContent>
           </Select>
-
-          {/* Instructor Filter - Only for Superadmin */}
-          {isSuperAdmin && (
-            <Select value={filterInstructor} onValueChange={setFilterInstructor}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Por instructor" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                {mockInstructores.map(i => (
-                  <SelectItem key={i.id} value={i.id}>{i.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
           <div className="flex gap-2">
-            {(['all', 'open', 'resolved', ...(isSuperAdmin ? ['reported'] : [])] as const).map((status) => (
+            {(['all', 'open', 'resolved'] as const).map((status) => (
               <Button
                 key={status}
                 variant={filterStatus === status ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setFilterStatus(status as any)}
+                onClick={() => setFilterStatus(status)}
               >
                 {status === 'all' && 'Todos'}
                 {status === 'open' && 'Abiertos'}
                 {status === 'resolved' && 'Resueltos'}
-                {status === 'reported' && 'Reportados'}
               </Button>
             ))}
           </div>
@@ -455,4 +367,4 @@ export function ComentariosPage() {
   );
 }
 
-export default ComentariosPage;
+export default InstructorComentariosPage;
