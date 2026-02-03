@@ -14,7 +14,8 @@ import {
   Check,
   Eye,
   GripVertical,
-  Zap
+  Zap,
+  Upload
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +40,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { BatchUploadDialog } from '@/components/education/BatchUploadDialog';
 
 interface Clase {
   id: string;
@@ -438,6 +440,16 @@ export function ClasesPage() {
             {totalClases} clase(s) encontrada(s)
           </p>
           <div className="flex gap-2">
+            <BatchUploadDialog
+              contentType="clases"
+              onComplete={(data) => console.log('Imported clases:', data)}
+              trigger={
+                <Button variant="outline">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Carga Masiva
+                </Button>
+              }
+            />
             <CreateClaseDialog />
             <CreateClaseDialog isActivity />
           </div>

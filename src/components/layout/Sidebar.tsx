@@ -35,8 +35,7 @@ const superadminNavItems: NavItem[] = [
   { label: 'Estudiantes', href: '/estudiantes', icon: <Users className="w-5 h-5" />, section: 'GESTIÓN' },
   { label: 'Evaluaciones', href: '/evaluaciones', icon: <ClipboardCheck className="w-5 h-5" />, badge: 5 },
   { label: 'Comentarios', href: '/comentarios', icon: <MessageSquare className="w-5 h-5" />, badge: 12 },
-  { label: 'Batch Upload', href: '/batch-upload', icon: <Upload className="w-5 h-5" />, section: 'HERRAMIENTAS' },
-  { label: 'Organizaciones', href: '/organizaciones', icon: <Building2 className="w-5 h-5" /> },
+  { label: 'Organizaciones', href: '/organizaciones', icon: <Building2 className="w-5 h-5" />, section: 'HERRAMIENTAS' },
 ];
 
 // Instructor navigation

@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Search,
   Filter,
+  Upload
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +49,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 import { RubricaEditor } from '@/components/education/RubricaEditor';
 import { ExamenFinalEditor } from '@/components/education/ExamenFinalEditor';
+import { BatchUploadDialog } from '@/components/education/BatchUploadDialog';
 
 // Mock data
 const mockPrograma = {
@@ -464,6 +466,19 @@ export function InstructorProgramaDetail() {
 
           {/* Evaluación Final Tab */}
           <TabsContent value="evaluacion">
+            <div className="flex justify-end mb-4">
+              <BatchUploadDialog
+                contentType="examenes"
+                programId={id}
+                onComplete={(data) => console.log('Imported examen config:', data)}
+                trigger={
+                  <Button variant="outline">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Importar Configuración
+                  </Button>
+                }
+              />
+            </div>
             <ExamenFinalEditor
               config={{
                 objetivo: 'Identificar y marcar en un gráfico real los conceptos fundamentales aprendidos durante el programa.',
@@ -478,7 +493,20 @@ export function InstructorProgramaDetail() {
           {/* Rúbrica Tab */}
           <TabsContent value="rubrica">
             <div className="bg-card border border-border rounded-xl p-6">
-              <h3 className="font-semibold text-foreground mb-6">Rúbrica de Evaluación</h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-semibold text-foreground">Rúbrica de Evaluación</h3>
+                <BatchUploadDialog
+                  contentType="rubricas"
+                  programId={id}
+                  onComplete={(data) => console.log('Imported rubrica:', data)}
+                  trigger={
+                    <Button variant="outline">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Importar Rúbrica
+                    </Button>
+                  }
+                />
+              </div>
               <RubricaEditor
                 competencias={programa.competencias.map(comp => ({
                   id: comp.id,

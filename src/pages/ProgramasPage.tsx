@@ -12,8 +12,10 @@ import {
   Eye,
   Clock,
   Users,
-  BookOpen
+  BookOpen,
+  Upload
 } from 'lucide-react';
+import { BatchUploadDialog } from '@/components/education/BatchUploadDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -134,10 +136,22 @@ export function ProgramasPage() {
               }
             </p>
           </div>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo Programa
-          </Button>
+          <div className="flex items-center gap-2">
+            <BatchUploadDialog
+              contentType="programas"
+              onComplete={(data) => console.log('Imported programas:', data)}
+              trigger={
+                <Button variant="outline">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Carga Masiva
+                </Button>
+              }
+            />
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Programa
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}

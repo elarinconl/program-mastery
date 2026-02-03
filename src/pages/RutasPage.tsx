@@ -8,9 +8,11 @@ import {
   Edit,
   Trash2,
   Eye,
-  ArrowUpDown
+  ArrowUpDown,
+  Upload
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { BatchUploadDialog } from '@/components/education/BatchUploadDialog';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -109,10 +111,22 @@ export function RutasPage() {
               Colecciones de programas ordenados por nivel y tier
             </p>
           </div>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Nueva Ruta
-          </Button>
+          <div className="flex items-center gap-2">
+            <BatchUploadDialog
+              contentType="rutas"
+              onComplete={(data) => console.log('Imported rutas:', data)}
+              trigger={
+                <Button variant="outline">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Carga Masiva
+                </Button>
+              }
+            />
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Nueva Ruta
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
