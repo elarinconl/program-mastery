@@ -138,10 +138,10 @@ function HistoryDialog({ submission }: { submission: Submission }) {
 interface EvaluationDialogProps {
   submission: Submission;
   competencias: Competencia[];
+  umbralAprobacion?: number;
 }
 
-function EvaluationDialog({ submission, competencias }: EvaluationDialogProps) {
-  const [isApproved, setIsApproved] = useState<boolean | null>(null);
+function EvaluationDialog({ submission, competencias, umbralAprobacion = 6 }: EvaluationDialogProps) {
   const [feedback, setFeedback] = useState('');
   const [competencyScores, setCompetencyScores] = useState<Record<string, number>>({});
 
@@ -166,6 +166,7 @@ function EvaluationDialog({ submission, competencias }: EvaluationDialogProps) {
   };
 
   const totalScore = calculateTotalScore();
+  const isApproved = totalScore !== null && totalScore >= umbralAprobacion;
 
   return (
     <Dialog>
@@ -207,95 +208,101 @@ function EvaluationDialog({ submission, competencias }: EvaluationDialogProps) {
             </Button>
           </div>
 
-          {/* Approve/Reject Selection */}
-          <div>
-            <Label className="mb-3 block">Resultado</Label>
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                variant={isApproved === true ? 'default' : 'outline'}
-                className={cn(isApproved === true && 'bg-success hover:bg-success/90')}
-                onClick={() => setIsApproved(true)}
-              >
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                Aprobar
-              </Button>
-              <Button
-                type="button"
-                variant={isApproved === false ? 'default' : 'outline'}
-                className={cn(isApproved === false && 'bg-destructive hover:bg-destructive/90')}
-                onClick={() => setIsApproved(false)}
-              >
-                <XCircle className="w-4 h-4 mr-2" />
-                Rechazar
-              </Button>
+          {/* Evaluación por Competencias - Siempre visible desde el inicio */}
+          <div className="space-y-6">
+            <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <h4 className="font-semibold mb-2 text-lg">Evaluación por Competencias</h4>
+              <p className="text-sm text-muted-foreground">
+                Selecciona el nivel alcanzado para cada competencia. El sistema calculará automáticamente la calificación final y determinará si se aprueba o rechaza según el umbral establecido ({umbralAprobacion}/10).
+              </p>
             </div>
-          </div>
 
-          {/* If Approved - Show competency evaluation */}
-          {isApproved === true && (
-            <div className="space-y-6">
-              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                <h4 className="font-medium mb-2">Evaluación por Competencias</h4>
-                <p className="text-sm text-muted-foreground">
-                  Selecciona el nivel alcanzado para cada competencia.
-                </p>
-              </div>
-
-              {competencias.map((comp) => (
-                <div key={comp.id} className="border border-border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h5 className="font-medium">{comp.name}</h5>
-                      <p className="text-sm text-muted-foreground">Peso: {comp.peso}%</p>
-                    </div>
-                    {competencyScores[comp.id] && (
-                      <Badge variant="outline" className="bg-primary/10 text-primary">
-                        Nivel {competencyScores[comp.id]} - {comp.scorePerLevel[competencyScores[comp.id] as keyof typeof comp.scorePerLevel]} pts
-                      </Badge>
-                    )}
+            {competencias.map((comp) => (
+              <div key={comp.id} className="border border-border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h5 className="font-medium">{comp.name}</h5>
+                    <p className="text-sm text-muted-foreground">Peso: {comp.peso}%</p>
                   </div>
-                  <RadioGroup
-                    value={competencyScores[comp.id]?.toString()}
-                    onValueChange={(val) => handleCompetencyScore(comp.id, parseInt(val))}
-                    className="grid grid-cols-4 gap-3"
-                  >
-                    {comp.niveles.map((nivel) => (
-                      <div key={nivel.nivel} className="relative">
-                        <RadioGroupItem
-                          value={nivel.nivel.toString()}
-                          id={`${comp.id}-${nivel.nivel}`}
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor={`${comp.id}-${nivel.nivel}`}
-                          className={cn(
-                            "flex flex-col p-3 border rounded-lg cursor-pointer transition-all",
-                            "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5",
-                            "hover:border-primary/50"
-                          )}
-                        >
-                          <span className="font-medium text-sm mb-1">
-                            Nivel {nivel.nivel} ({comp.scorePerLevel[nivel.nivel as keyof typeof comp.scorePerLevel]} pts)
-                          </span>
-                          <span className="text-xs text-muted-foreground line-clamp-3">
-                            {nivel.descripcion}
-                          </span>
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
+                  {competencyScores[comp.id] && (
+                    <Badge variant="outline" className="bg-primary/10 text-primary">
+                      Nivel {competencyScores[comp.id]} - {comp.scorePerLevel[competencyScores[comp.id] as keyof typeof comp.scorePerLevel]} pts
+                    </Badge>
+                  )}
                 </div>
-              ))}
+                <RadioGroup
+                  value={competencyScores[comp.id]?.toString()}
+                  onValueChange={(val) => handleCompetencyScore(comp.id, parseInt(val))}
+                  className="grid grid-cols-4 gap-3"
+                >
+                  {comp.niveles.map((nivel) => (
+                    <div key={nivel.nivel} className="relative">
+                      <RadioGroupItem
+                        value={nivel.nivel.toString()}
+                        id={`${comp.id}-${nivel.nivel}`}
+                        className="peer sr-only"
+                      />
+                      <Label
+                        htmlFor={`${comp.id}-${nivel.nivel}`}
+                        className={cn(
+                          "flex flex-col p-3 border rounded-lg cursor-pointer transition-all",
+                          "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5",
+                          "hover:border-primary/50"
+                        )}
+                      >
+                        <span className="font-medium text-sm mb-1">
+                          Nivel {nivel.nivel} ({comp.scorePerLevel[nivel.nivel as keyof typeof comp.scorePerLevel]} pts)
+                        </span>
+                        <span className="text-xs text-muted-foreground line-clamp-3">
+                          {nivel.descripcion}
+                        </span>
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            ))}
 
-              {totalScore !== null && (
-                <div className="p-6 bg-success/10 rounded-lg border border-success/20 text-center">
+            {/* Calificación Final y Resultado Calculado */}
+            {totalScore !== null && (
+              <div className="space-y-4">
+                <div className={cn(
+                  "p-6 rounded-lg border text-center",
+                  isApproved 
+                    ? "bg-success/10 border-success/20" 
+                    : "bg-destructive/10 border-destructive/20"
+                )}>
                   <p className="text-sm text-muted-foreground mb-1">Calificación Final</p>
-                  <p className="text-4xl font-bold text-success">{totalScore}/10</p>
+                  <p className={cn(
+                    "text-4xl font-bold mb-2",
+                    isApproved ? "text-success" : "text-destructive"
+                  )}>
+                    {totalScore}/10
+                  </p>
+                  <Badge 
+                    variant="outline"
+                    className={cn(
+                      isApproved 
+                        ? "border-success/50 bg-success/10 text-success"
+                        : "border-destructive/50 bg-destructive/10 text-destructive"
+                    )}
+                  >
+                    {isApproved ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 mr-1" />
+                        Aprobado (Umbral: {umbralAprobacion}/10)
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-4 h-4 mr-1" />
+                        Rechazado (Umbral: {umbralAprobacion}/10)
+                      </>
+                    )}
+                  </Badge>
                 </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
 
           {/* Feedback */}
           <div>
@@ -303,15 +310,15 @@ function EvaluationDialog({ submission, competencias }: EvaluationDialogProps) {
             <Textarea
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder={isApproved === false 
+              placeholder={totalScore !== null && !isApproved
                 ? "Explica los motivos del rechazo y qué debe mejorar..."
                 : "Comentarios adicionales (opcional)..."
               }
               className="mt-1"
               rows={4}
             />
-            {isApproved === false && !feedback && (
-              <p className="text-sm text-destructive mt-1">El feedback es obligatorio para rechazar</p>
+            {totalScore !== null && !isApproved && !feedback && (
+              <p className="text-sm text-destructive mt-1">El feedback es obligatorio cuando se rechaza</p>
             )}
           </div>
         </div>
@@ -319,13 +326,18 @@ function EvaluationDialog({ submission, competencias }: EvaluationDialogProps) {
         <DialogFooter>
           <Button variant="outline">Cancelar</Button>
           <Button
-            disabled={isApproved === null || (isApproved === false && !feedback) || (isApproved === true && Object.keys(competencyScores).length !== competencias.length)}
+            disabled={totalScore === null || (!isApproved && !feedback)}
             className={cn(
-              isApproved === true && 'bg-success hover:bg-success/90',
-              isApproved === false && 'bg-destructive hover:bg-destructive/90'
+              isApproved && 'bg-success hover:bg-success/90',
+              !isApproved && totalScore !== null && 'bg-destructive hover:bg-destructive/90'
             )}
           >
-            {isApproved === true ? 'Aprobar Evaluación' : isApproved === false ? 'Rechazar Evaluación' : 'Guardar'}
+            {totalScore === null 
+              ? 'Completar Evaluación' 
+              : isApproved 
+                ? 'Enviar Calificación (Aprobado)' 
+                : 'Enviar Calificación (Rechazado)'
+            }
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -338,20 +350,21 @@ interface EvaluationsTabContentProps {
   competencias: Competencia[];
   showSearch?: boolean;
   showProgramaColumn?: boolean;
+  umbralAprobacion?: number;
 }
 
 export function EvaluationsTabContent({ 
   submissions, 
   competencias,
   showSearch = true,
-  showProgramaColumn = false 
+  showProgramaColumn = false,
+  umbralAprobacion = 6
 }: EvaluationsTabContentProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
 
   const filteredSubmissions = submissions.filter(sub => {
-    const matchesSearch = sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      sub.studentEmail.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = sub.studentName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = filterStatus === 'all' || sub.currentStatus === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -420,10 +433,7 @@ export function EvaluationsTabContent({
               return (
                 <TableRow key={sub.id}>
                   <TableCell>
-                    <div>
-                      <p className="font-medium">{sub.studentName}</p>
-                      <p className="text-sm text-muted-foreground">{sub.studentEmail}</p>
-                    </div>
+                    <p className="font-medium">{sub.studentName}</p>
                   </TableCell>
                   {showProgramaColumn && (
                     <TableCell>
@@ -466,6 +476,7 @@ export function EvaluationsTabContent({
                         <EvaluationDialog 
                           submission={sub}
                           competencias={competencias}
+                          umbralAprobacion={umbralAprobacion}
                         />
                       )}
                     </div>

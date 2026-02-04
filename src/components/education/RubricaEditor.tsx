@@ -103,7 +103,10 @@ export function RubricaEditor({ competencias: initialCompetencias, onSave, readO
               <h4 className="font-medium">{comp.name}</h4>
               <span className="text-sm text-muted-foreground">Peso: {comp.peso}%</span>
             </div>
-            <div className="grid grid-cols-4 gap-3">
+            <div 
+              className="grid gap-3"
+              style={{ gridTemplateColumns: `repeat(${comp.niveles.length}, minmax(0, 1fr))` }}
+            >
               {comp.niveles.map((nivel) => (
                 <div key={nivel.nivel} className="p-3 bg-muted/50 rounded-lg">
                   <p className="font-medium text-sm mb-1">
@@ -195,8 +198,47 @@ export function RubricaEditor({ competencias: initialCompetencias, onSave, readO
 
                       {/* Niveles */}
                       <div>
-                        <Label className="mb-3 block">Niveles de Desempeño</Label>
-                        <div className="grid grid-cols-4 gap-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <Label>Niveles de Desempeño</Label>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newNiveles = [...comp.niveles];
+                                const newNivelNum = newNiveles.length + 1;
+                                newNiveles.push({
+                                  nivel: newNivelNum,
+                                  descripcion: '',
+                                  puntaje: newNivelNum * 2.5,
+                                });
+                                updateCompetencia(comp.id, 'niveles', newNiveles);
+                              }}
+                            >
+                              <Plus className="w-3 h-3 mr-1" />
+                              Agregar Nivel
+                            </Button>
+                            {comp.niveles.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const newNiveles = comp.niveles.slice(0, -1);
+                                  updateCompetencia(comp.id, 'niveles', newNiveles);
+                                }}
+                              >
+                                <Trash2 className="w-3 h-3 mr-1" />
+                                Eliminar Nivel
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <div 
+                          className="grid gap-4"
+                          style={{ gridTemplateColumns: `repeat(${comp.niveles.length}, minmax(0, 1fr))` }}
+                        >
                           {comp.niveles.map((nivel, nivelIndex) => (
                             <div key={nivel.nivel} className="space-y-2">
                               <div className="flex items-center justify-between">

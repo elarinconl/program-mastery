@@ -38,7 +38,6 @@ import { cn } from '@/lib/utils';
 interface Estudiante {
   id: string;
   name: string;
-  email: string;
   pais: string;
   tier: 'free' | 'basic' | 'pro' | 'premium';
   registro: string;
@@ -57,7 +56,6 @@ const mockEstudiantes: Estudiante[] = [
   {
     id: '1',
     name: 'Carlos García',
-    email: 'carlos@email.com',
     pais: 'México',
     tier: 'pro',
     registro: '2024-01-01',
@@ -74,7 +72,6 @@ const mockEstudiantes: Estudiante[] = [
   {
     id: '2',
     name: 'María López',
-    email: 'maria@email.com',
     pais: 'España',
     tier: 'premium',
     registro: '2024-01-05',
@@ -91,7 +88,6 @@ const mockEstudiantes: Estudiante[] = [
   {
     id: '3',
     name: 'Juan Pérez',
-    email: 'juan@email.com',
     pais: 'Argentina',
     tier: 'basic',
     registro: '2024-01-10',
@@ -108,7 +104,6 @@ const mockEstudiantes: Estudiante[] = [
   {
     id: '4',
     name: 'Ana Martínez',
-    email: 'ana@email.com',
     pais: 'Colombia',
     tier: 'pro',
     registro: '2024-01-15',
@@ -150,8 +145,7 @@ export function EstudiantesPage() {
   const [filterInstructor, setFilterInstructor] = useState<string>('all');
 
   const filteredEstudiantes = mockEstudiantes.filter(est => {
-    const matchesSearch = est.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      est.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = est.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesPrograma = filterPrograma === 'all' || est.programaId === filterPrograma;
     const matchesInstructor = filterInstructor === 'all' || est.instructorId === filterInstructor;
     return matchesSearch && matchesPrograma && matchesInstructor;
@@ -221,7 +215,6 @@ export function EstudiantesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Estudiante</TableHead>
-                <TableHead>País</TableHead>
                 <TableHead>Plan</TableHead>
                 <TableHead>Programa</TableHead>
                 {isSuperAdmin && <TableHead>Instructor</TableHead>}
@@ -238,10 +231,9 @@ export function EstudiantesPage() {
                   <TableCell>
                     <div>
                       <p className="font-medium">{est.name}</p>
-                      <p className="text-sm text-muted-foreground">{est.email}</p>
+                      <p className="text-sm text-muted-foreground">{est.pais}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{est.pais}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={cn(tierColors[est.tier])}>
                       {est.tier.charAt(0).toUpperCase() + est.tier.slice(1)}

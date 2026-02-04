@@ -27,20 +27,22 @@ interface NavItem {
 
 // Superadmin navigation
 const superadminNavItems: NavItem[] = [
+  { label: 'Dashboard', href: '/superadmin', icon: <Home className="w-5 h-5" />, section: 'INSTRUCTOR WORKSPACE' },
+  { label: 'Programas Activos', href: '/superadmin/programas', icon: <BookOpen className="w-5 h-5" /> },
+  { label: 'Estudiantes', href: '/estudiantes', icon: <Users className="w-5 h-5" /> },
+  { label: 'Evaluaciones', href: '/evaluaciones', icon: <ClipboardCheck className="w-5 h-5" />, badge: 5 },
+  { label: 'Comentarios', href: '/comentarios', icon: <MessageSquare className="w-5 h-5" />, badge: 12 },
   { label: 'Overview', href: '/', icon: <LayoutDashboard className="w-5 h-5" />, section: 'EDUCACIÓN' },
   { label: 'Fases', href: '/fases', icon: <Layers className="w-5 h-5" /> },
   { label: 'Rutas', href: '/rutas', icon: <Route className="w-5 h-5" /> },
   { label: 'Programas', href: '/programas', icon: <BookOpen className="w-5 h-5" /> },
   { label: 'Clases', href: '/clases', icon: <Video className="w-5 h-5" /> },
-  { label: 'Estudiantes', href: '/estudiantes', icon: <Users className="w-5 h-5" />, section: 'GESTIÓN' },
-  { label: 'Evaluaciones', href: '/evaluaciones', icon: <ClipboardCheck className="w-5 h-5" />, badge: 5 },
-  { label: 'Comentarios', href: '/comentarios', icon: <MessageSquare className="w-5 h-5" />, badge: 12 },
   { label: 'Organizaciones', href: '/organizaciones', icon: <Building2 className="w-5 h-5" />, section: 'HERRAMIENTAS' },
 ];
 
 // Instructor navigation
 const instructorNavItems: NavItem[] = [
-  { label: 'Dashboard', href: '/instructor', icon: <Home className="w-5 h-5" />, section: 'MY WORKSPACE' },
+  { label: 'Dashboard', href: '/instructor', icon: <Home className="w-5 h-5" />, section: 'MI WORKSPACE' },
   { label: 'Mis Programas', href: '/instructor/programas', icon: <BookOpen className="w-5 h-5" /> },
   { label: 'Estudiantes', href: '/instructor/estudiantes', icon: <Users className="w-5 h-5" /> },
   { label: 'Evaluaciones', href: '/instructor/evaluaciones', icon: <ClipboardCheck className="w-5 h-5" />, badge: 3 },
@@ -80,7 +82,7 @@ export function Sidebar() {
             if (item.section) currentSection = item.section;
 
             const isActive = location.pathname === item.href || 
-              (item.href !== '/' && item.href !== '/instructor' && location.pathname.startsWith(item.href));
+              (item.href !== '/' && item.href !== '/instructor' && item.href !== '/superadmin' && location.pathname.startsWith(item.href));
 
             return (
               <li key={item.href}>

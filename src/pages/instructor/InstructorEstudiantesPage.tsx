@@ -2,10 +2,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { useState } from 'react';
 import { 
   Search, 
-  Filter, 
   Download,
-  Eye,
-  MoreHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,12 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -131,14 +122,13 @@ export function InstructorEstudiantesPage() {
   const [filterPrograma, setFilterPrograma] = useState<string>('all');
 
   const filteredEstudiantes = mockEstudiantes.filter(est => {
-    const matchesSearch = est.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      est.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = est.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesPrograma = filterPrograma === 'all' || est.programaId === filterPrograma;
     return matchesSearch && matchesPrograma;
   });
 
   return (
-    <MainLayout breadcrumbs={[{ label: 'my workspace' }, { label: 'estudiantes' }]}>
+    <MainLayout breadcrumbs={[{ label: 'mi workspace' }, { label: 'estudiantes' }]}>
       <div className="max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -184,7 +174,6 @@ export function InstructorEstudiantesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Estudiante</TableHead>
-                <TableHead>País</TableHead>
                 <TableHead>Plan</TableHead>
                 <TableHead>Programa</TableHead>
                 <TableHead>Avance</TableHead>
@@ -192,7 +181,6 @@ export function InstructorEstudiantesPage() {
                 <TableHead>Clase Actual</TableHead>
                 <TableHead>Examen</TableHead>
                 <TableHead>Certificación</TableHead>
-                <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -201,10 +189,9 @@ export function InstructorEstudiantesPage() {
                   <TableCell>
                     <div>
                       <p className="font-medium">{est.name}</p>
-                      <p className="text-sm text-muted-foreground">{est.email}</p>
+                      <p className="text-sm text-muted-foreground">{est.pais}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{est.pais}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={cn(tierColors[est.tier])}>
                       {est.tier.charAt(0).toUpperCase() + est.tier.slice(1)}
@@ -252,21 +239,6 @@ export function InstructorEstudiantesPage() {
                       {est.estadoCert === 'pending' && 'Pendiente'}
                       {est.estadoCert === 'issued' && 'Emitida'}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="w-4 h-4 mr-2" />
-                          Ver perfil
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}

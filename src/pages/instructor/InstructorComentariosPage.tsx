@@ -114,7 +114,7 @@ export function InstructorComentariosPage() {
       });
 
   return (
-    <MainLayout breadcrumbs={[{ label: 'my workspace' }, { label: 'comentarios' }]}>
+    <MainLayout breadcrumbs={[{ label: 'mi workspace' }, { label: 'comentarios' }]}>
       <div className="max-w-4xl">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">

@@ -1,13 +1,23 @@
 import { MainLayout } from '@/components/layout/MainLayout';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Clock,
   Users,
   Layers,
+  Search,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -30,7 +40,15 @@ interface ProgramaRow {
   pendingEvaluations: number;
   pendingComments: number;
   avgProgress: number;
+  instructorId: string;
+  instructorName: string;
 }
+
+const mockInstructores = [
+  { id: 'inst1', name: 'Carlos Mendoza' },
+  { id: 'inst2', name: 'Ana García' },
+  { id: 'inst3', name: 'Luis Rodríguez' },
+];
 
 const mockProgramas: ProgramaRow[] = [
   {
@@ -46,6 +64,8 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 2,
     pendingComments: 5,
     avgProgress: 68,
+    instructorId: 'inst1',
+    instructorName: 'Carlos Mendoza',
   },
   {
     id: '2',
@@ -60,6 +80,8 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 1,
     pendingComments: 2,
     avgProgress: 54,
+    instructorId: 'inst1',
+    instructorName: 'Carlos Mendoza',
   },
   {
     id: '3',
@@ -74,6 +96,8 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 0,
     pendingComments: 1,
     avgProgress: 82,
+    instructorId: 'inst2',
+    instructorName: 'Ana García',
   },
   {
     id: '4',
@@ -88,6 +112,24 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 0,
     pendingComments: 0,
     avgProgress: 45,
+    instructorId: 'inst3',
+    instructorName: 'Luis Rodríguez',
+  },
+  {
+    id: '5',
+    name: 'Análisis Fundamental',
+    ruta: 'Análisis Técnico Básico',
+    fase: 'Aplicación',
+    modulosCount: 4,
+    clasesCount: 15,
+    duration: '7h 20m',
+    studentsCount: 156,
+    tier: 'basic',
+    pendingEvaluations: 3,
+    pendingComments: 4,
+    avgProgress: 72,
+    instructorId: 'inst2',
+    instructorName: 'Ana García',
   },
 ];
 
@@ -98,16 +140,65 @@ const tierColors = {
   premium: 'border-amber-200 bg-amber-50 text-amber-700',
 };
 
-export function InstructorProgramasPage() {
+export function SuperAdminProgramasPage() {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterInstructor, setFilterInstructor] = useState<string>('all');
+  const [filterPrograma, setFilterPrograma] = useState<string>('all');
+
+  const filteredProgramas = mockProgramas.filter(prog => {
+    const matchesSearch = prog.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      prog.instructorName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesInstructor = filterInstructor === 'all' || prog.instructorId === filterInstructor;
+    const matchesPrograma = filterPrograma === 'all' || prog.id === filterPrograma;
+    return matchesSearch && matchesInstructor && matchesPrograma;
+  });
+
+  const uniqueProgramas = Array.from(new Set(mockProgramas.map(p => p.id)))
+    .map(id => mockProgramas.find(p => p.id === id)!);
 
   return (
-    <MainLayout breadcrumbs={[{ label: 'mi workspace' }, { label: 'mis programas' }]}>
+    <MainLayout breadcrumbs={[{ label: 'instructor workspace' }, { label: 'programas activos' }]}>
       <div className="max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground">Mis Programas</h1>
-          <p className="text-muted-foreground">Programas asignados para gestionar</p>
+          <h1 className="text-2xl font-bold text-foreground">Programas Activos</h1>
+          <p className="text-muted-foreground">Todos los programas asignados a instructores</p>
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por programa o instructor..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Select value={filterInstructor} onValueChange={setFilterInstructor}>
+            <SelectTrigger className="w-[250px]">
+              <SelectValue placeholder="Filtrar por instructor" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los instructores</SelectItem>
+              {mockInstructores.map(inst => (
+                <SelectItem key={inst.id} value={inst.id}>{inst.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={filterPrograma} onValueChange={setFilterPrograma}>
+            <SelectTrigger className="w-[250px]">
+              <SelectValue placeholder="Filtrar por programa" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los programas</SelectItem>
+              {uniqueProgramas.map(prog => (
+                <SelectItem key={prog.id} value={prog.id}>{prog.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Programs Table */}
@@ -116,6 +207,7 @@ export function InstructorProgramasPage() {
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead className="font-semibold">Programa</TableHead>
+                <TableHead className="font-semibold">Instructor</TableHead>
                 <TableHead className="font-semibold">Tier</TableHead>
                 <TableHead className="font-semibold">Fase</TableHead>
                 <TableHead className="font-semibold">Ruta</TableHead>
@@ -127,14 +219,17 @@ export function InstructorProgramasPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockProgramas.map((programa) => (
+              {filteredProgramas.map((programa) => (
                 <TableRow 
-                  key={programa.id} 
+                  key={`${programa.id}-${programa.instructorId}`} 
                   className="hover:bg-muted/30 cursor-pointer"
-                  onClick={() => navigate(`/instructor/programas/${programa.id}`)}
+                  onClick={() => navigate(`/superadmin/programas/${programa.id}?instructor=${programa.instructorId}`)}
                 >
                   <TableCell>
                     <span className="font-medium text-foreground">{programa.name}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm text-foreground">{programa.instructorName}</span>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className={cn('text-xs', tierColors[programa.tier])}>
@@ -177,6 +272,13 @@ export function InstructorProgramasPage() {
                   </TableCell>
                 </TableRow>
               ))}
+              {filteredProgramas.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                    No hay programas que mostrar con los filtros seleccionados
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
@@ -185,4 +287,4 @@ export function InstructorProgramasPage() {
   );
 }
 
-export default InstructorProgramasPage;
+export default SuperAdminProgramasPage;

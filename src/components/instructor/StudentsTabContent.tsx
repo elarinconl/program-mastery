@@ -59,8 +59,7 @@ export function StudentsTabContent({
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredEstudiantes = estudiantes.filter(est => {
-    const matchesSearch = est.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      est.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = est.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
@@ -95,7 +94,6 @@ export function StudentsTabContent({
           <TableHeader>
             <TableRow>
               <TableHead>Estudiante</TableHead>
-              <TableHead>País</TableHead>
               <TableHead>Plan</TableHead>
               <TableHead>Avance</TableHead>
               <TableHead>Módulo Actual</TableHead>
@@ -111,10 +109,9 @@ export function StudentsTabContent({
                 <TableCell>
                   <div>
                     <p className="font-medium">{est.name}</p>
-                    <p className="text-sm text-muted-foreground">{est.email}</p>
+                    <p className="text-sm text-muted-foreground">{est.pais}</p>
                   </div>
                 </TableCell>
-                <TableCell>{est.pais}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={cn(tierColors[est.tier] || tierColors[est.tier.toLowerCase()])}>
                     {est.tier.charAt(0).toUpperCase() + est.tier.slice(1).toLowerCase()}
@@ -179,7 +176,7 @@ export function StudentsTabContent({
             ))}
             {filteredEstudiantes.length === 0 && (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   No hay estudiantes que mostrar
                 </TableCell>
               </TableRow>

@@ -117,14 +117,10 @@ function CommentCard({
             </AvatarFallback>
           </Avatar>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-1">
               <span className="font-medium">{comentario.studentName}</span>
-              <span className="text-sm text-muted-foreground">•</span>
-              <span className="text-sm text-muted-foreground">{comentario.date}</span>
             </div>
-            {comentario.studentEmail && (
-              <span className="text-sm text-muted-foreground">{comentario.studentEmail}</span>
-            )}
+            <span className="text-sm text-muted-foreground">{comentario.date}</span>
           </div>
         </div>
         <Badge 

@@ -25,6 +25,10 @@ import InstructorEvaluacionesPage from "./pages/instructor/InstructorEvaluacione
 import InstructorComentariosPage from "./pages/instructor/InstructorComentariosPage";
 import InstructorEducacionPage from "./pages/instructor/InstructorEducacionPage";
 
+// Superadmin pages
+import SuperAdminProgramasPage from "./pages/superadmin/SuperAdminProgramasPage";
+import SuperAdminProgramaDetail from "./pages/superadmin/SuperAdminProgramaDetail";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,6 +41,9 @@ const App = () => (
           <Routes>
             {/* Superadmin Routes */}
             <Route path="/" element={<EducationOverview />} />
+            <Route path="/superadmin" element={<InstructorDashboard />} />
+            <Route path="/superadmin/programas" element={<SuperAdminProgramasPage />} />
+            <Route path="/superadmin/programas/:id" element={<SuperAdminProgramaDetail />} />
             <Route path="/fases" element={<FasesPage />} />
             <Route path="/rutas" element={<RutasPage />} />
             <Route path="/programas" element={<ProgramasPage />} />

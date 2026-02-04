@@ -1,6 +1,6 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { 
   ArrowLeft,
   BookOpen,
@@ -12,7 +12,7 @@ import {
   ClipboardCheck,
   MessageSquare,
   ArrowRight,
-  TrendingUp,
+  User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +27,12 @@ import type { Estudiante } from '@/components/instructor/StudentsTabContent';
 import type { Comentario } from '@/components/instructor/CommentsTabContent';
 
 // Mock data
+const mockInstructores = [
+  { id: 'inst1', name: 'Carlos Mendoza' },
+  { id: 'inst2', name: 'Ana García' },
+  { id: 'inst3', name: 'Luis Rodríguez' },
+];
+
 const mockPrograma = {
   id: '1',
   name: 'Fundamentos del Análisis Técnico',
@@ -276,11 +282,14 @@ const tierColors = {
   premium: 'border-amber-200 bg-amber-50 text-amber-700',
 };
 
-export function InstructorProgramaDetail() {
+export function SuperAdminProgramaDetail() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const instructorId = searchParams.get('instructor');
   const [activeTab, setActiveTab] = useState('evaluacion');
 
   const programa = mockPrograma;
+  const instructor = mockInstructores.find(inst => inst.id === instructorId) || mockInstructores[0];
   const pendingEvaluations = mockSubmissions.filter(s => s.currentStatus === 'pending').length;
   const openComments = mockComentarios.filter(c => c.status === 'open').length;
   
@@ -291,15 +300,15 @@ export function InstructorProgramaDetail() {
     : 0;
 
   return (
-    <MainLayout breadcrumbs={[{ label: 'mi workspace' }, { label: 'mis programas' }, { label: programa.name }]}>
+    <MainLayout breadcrumbs={[{ label: 'instructor workspace' }, { label: 'programas activos' }, { label: programa.name }]}>
       <div className="max-w-7xl">
         {/* Back button */}
         <Link 
-          to="/instructor/programas" 
+          to="/superadmin/programas" 
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Volver a mis programas
+          Volver a programas activos
         </Link>
 
         {/* Header */}
@@ -315,6 +324,11 @@ export function InstructorProgramaDetail() {
             <Badge variant="outline" className={cn(tierColors[programa.tier])}>
               {programa.tier.charAt(0).toUpperCase() + programa.tier.slice(1)}
             </Badge>
+          </div>
+
+          <div className="flex items-center gap-2 mb-4">
+            <User className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Instructor: <span className="font-medium text-foreground">{instructor.name}</span></span>
           </div>
           
           <p className="text-muted-foreground mb-4">{programa.description}</p>
@@ -346,7 +360,7 @@ export function InstructorProgramaDetail() {
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Users className="w-5 h-5 text-primary" />
               </div>
-              <Link to={`/instructor/estudiantes?programa=${id}`}>
+              <Link to={`/estudiantes?programa=${id}&instructor=${instructorId}`}>
                 <Button variant="ghost" size="sm">
                   Ver todos
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -363,7 +377,7 @@ export function InstructorProgramaDetail() {
               <div className="p-2 bg-warning/10 rounded-lg">
                 <ClipboardCheck className="w-5 h-5 text-warning" />
               </div>
-              <Link to={`/instructor/evaluaciones?programa=${id}`}>
+              <Link to={`/evaluaciones?programa=${id}&instructor=${instructorId}`}>
                 <Button variant="ghost" size="sm">
                   Ver todas
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -384,7 +398,7 @@ export function InstructorProgramaDetail() {
               <div className="p-2 bg-destructive/10 rounded-lg">
                 <MessageSquare className="w-5 h-5 text-destructive" />
               </div>
-              <Link to={`/instructor/comentarios?programa=${id}`}>
+              <Link to={`/comentarios?programa=${id}&instructor=${instructorId}`}>
                 <Button variant="ghost" size="sm">
                   Ver todos
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -483,4 +497,4 @@ export function InstructorProgramaDetail() {
   );
 }
 
-export default InstructorProgramaDetail;
+export default SuperAdminProgramaDetail;

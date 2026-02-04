@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useRole } from '@/contexts/RoleContext';
 
 const mockStats = {
   programasAsignados: 4,
@@ -30,13 +31,26 @@ const mockPendingComments = [
 ];
 
 export function InstructorDashboard() {
+  const { isSuperAdmin } = useRole();
+  const workspaceLabel = isSuperAdmin ? 'instructor workspace' : 'mi workspace';
+  const workspaceTitle = isSuperAdmin ? 'Instructor Workspace' : 'Mi Workspace';
+  const programasLink = isSuperAdmin ? '/superadmin/programas' : '/instructor/programas';
+  const evaluacionesLink = isSuperAdmin ? '/evaluaciones' : '/instructor/evaluaciones';
+  const comentariosLink = isSuperAdmin ? '/comentarios' : '/instructor/comentarios';
+  const estudiantesLink = isSuperAdmin ? '/estudiantes' : '/instructor/estudiantes';
+
   return (
-    <MainLayout breadcrumbs={[{ label: 'my workspace' }, { label: 'dashboard' }]}>
+    <MainLayout breadcrumbs={[{ label: workspaceLabel }, { label: 'dashboard' }]}>
       <div className="max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground">My Workspace</h1>
-          <p className="text-muted-foreground">Resumen de tu actividad y tareas pendientes</p>
+          <h1 className="text-2xl font-bold text-foreground">{workspaceTitle}</h1>
+          <p className="text-muted-foreground">
+            {isSuperAdmin 
+              ? 'Resumen de todos los programas activos y actividad de instructores'
+              : 'Resumen de tu actividad y tareas pendientes'
+            }
+          </p>
         </div>
 
         {/* Stats */}
@@ -47,9 +61,9 @@ export function InstructorDashboard() {
                 <BookOpen className="w-5 h-5 text-primary" />
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">Programas Asignados</p>
+            <p className="text-sm text-muted-foreground">{isSuperAdmin ? 'Programas Activos' : 'Programas Asignados'}</p>
             <p className="text-3xl font-bold">{mockStats.programasAsignados}</p>
-            <Link to="/instructor/programas" className="text-sm text-primary hover:underline mt-2 inline-block">
+            <Link to={programasLink} className="text-sm text-primary hover:underline mt-2 inline-block">
               Ver programas →
             </Link>
           </div>
@@ -67,7 +81,7 @@ export function InstructorDashboard() {
             </div>
             <p className="text-sm text-muted-foreground">Evaluaciones Pendientes</p>
             <p className="text-3xl font-bold">{mockStats.evaluacionesPendientes}</p>
-            <Link to="/instructor/evaluaciones" className="text-sm text-primary hover:underline mt-2 inline-block">
+            <Link to={evaluacionesLink} className="text-sm text-primary hover:underline mt-2 inline-block">
               Revisar →
             </Link>
           </div>
@@ -85,7 +99,7 @@ export function InstructorDashboard() {
             </div>
             <p className="text-sm text-muted-foreground">Comentarios por Responder</p>
             <p className="text-3xl font-bold">{mockStats.comentariosSinResponder}</p>
-            <Link to="/instructor/comentarios" className="text-sm text-primary hover:underline mt-2 inline-block">
+            <Link to={comentariosLink} className="text-sm text-primary hover:underline mt-2 inline-block">
               Responder →
             </Link>
           </div>
@@ -98,7 +112,7 @@ export function InstructorDashboard() {
             </div>
             <p className="text-sm text-muted-foreground">Estudiantes</p>
             <p className="text-3xl font-bold">{mockStats.estudiantes}</p>
-            <Link to="/instructor/estudiantes" className="text-sm text-primary hover:underline mt-2 inline-block">
+            <Link to={estudiantesLink} className="text-sm text-primary hover:underline mt-2 inline-block">
               Ver estudiantes →
             </Link>
           </div>
@@ -112,7 +126,7 @@ export function InstructorDashboard() {
                 <ClipboardCheck className="w-5 h-5 text-warning" />
                 Evaluaciones Pendientes
               </h2>
-              <Link to="/instructor/evaluaciones">
+              <Link to={evaluacionesLink}>
                 <Button variant="ghost" size="sm">
                   Ver todas
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -144,7 +158,7 @@ export function InstructorDashboard() {
                 <MessageSquare className="w-5 h-5 text-destructive" />
                 Comentarios sin Responder
               </h2>
-              <Link to="/instructor/comentarios">
+              <Link to={comentariosLink}>
                 <Button variant="ghost" size="sm">
                   Ver todos
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -172,25 +186,25 @@ export function InstructorDashboard() {
         <div className="mt-8">
           <h2 className="font-semibold text-foreground mb-4">Accesos Rápidos</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link to="/instructor/evaluaciones">
+            <Link to={evaluacionesLink}>
               <Button variant="outline" className="w-full h-auto py-4 flex-col gap-2">
                 <ClipboardCheck className="w-6 h-6" />
                 <span>Evaluaciones Pendientes</span>
               </Button>
             </Link>
-            <Link to="/instructor/comentarios">
+            <Link to={comentariosLink}>
               <Button variant="outline" className="w-full h-auto py-4 flex-col gap-2">
                 <MessageSquare className="w-6 h-6" />
                 <span>Comentarios sin Responder</span>
               </Button>
             </Link>
-            <Link to="/instructor/programas">
+            <Link to={programasLink}>
               <Button variant="outline" className="w-full h-auto py-4 flex-col gap-2">
                 <BookOpen className="w-6 h-6" />
-                <span>Programas Asignados</span>
+                <span>{isSuperAdmin ? 'Programas Activos' : 'Programas Asignados'}</span>
               </Button>
             </Link>
-            <Link to="/instructor/estudiantes">
+            <Link to={estudiantesLink}>
               <Button variant="outline" className="w-full h-auto py-4 flex-col gap-2">
                 <Users className="w-6 h-6" />
                 <span>Estudiantes</span>
