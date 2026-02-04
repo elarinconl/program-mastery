@@ -50,7 +50,7 @@ interface Reply {
 const mockComentarios: Comentario[] = [
   {
     id: '1',
-    studentName: 'Ana Martínez',
+    studentName: 'Anita Martínez',
     studentEmail: 'ana@email.com',
     programa: 'Fundamentos del Análisis Técnico',
     programaId: 'p1',
