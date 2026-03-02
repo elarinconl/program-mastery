@@ -40,6 +40,10 @@ interface ProgramaRow {
   pendingEvaluations: number;
   pendingComments: number;
   avgProgress: number;
+  engagementRate: number;
+  completionRate: number;
+  approbationRate: number;
+  avgGrade: number;
   instructorId: string;
   instructorName: string;
 }
@@ -64,6 +68,10 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 2,
     pendingComments: 5,
     avgProgress: 68,
+    engagementRate: 60,
+    completionRate: 25,
+    approbationRate: 20,
+    avgGrade: 7.2,
     instructorId: 'inst1',
     instructorName: 'Carlos Mendoza',
   },
@@ -80,6 +88,10 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 1,
     pendingComments: 2,
     avgProgress: 54,
+    engagementRate: 72,
+    completionRate: 30,
+    approbationRate: 22,
+    avgGrade: 6.8,
     instructorId: 'inst1',
     instructorName: 'Carlos Mendoza',
   },
@@ -96,6 +108,10 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 0,
     pendingComments: 1,
     avgProgress: 82,
+    engagementRate: 85,
+    completionRate: 45,
+    approbationRate: 38,
+    avgGrade: 8.1,
     instructorId: 'inst2',
     instructorName: 'Ana García',
   },
@@ -112,6 +128,10 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 0,
     pendingComments: 0,
     avgProgress: 45,
+    engagementRate: 55,
+    completionRate: 15,
+    approbationRate: 10,
+    avgGrade: 6.5,
     instructorId: 'inst3',
     instructorName: 'Luis Rodríguez',
   },
@@ -128,6 +148,10 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 3,
     pendingComments: 4,
     avgProgress: 72,
+    engagementRate: 68,
+    completionRate: 35,
+    approbationRate: 28,
+    avgGrade: 7.5,
     instructorId: 'inst2',
     instructorName: 'Ana García',
   },
@@ -215,6 +239,10 @@ export function SuperAdminProgramasPage() {
                 <TableHead className="font-semibold text-center">Clases</TableHead>
                 <TableHead className="font-semibold text-center">Duración</TableHead>
                 <TableHead className="font-semibold text-center">Estudiantes</TableHead>
+                <TableHead className="font-semibold text-center">Engagement</TableHead>
+                <TableHead className="font-semibold text-center">Completion</TableHead>
+                <TableHead className="font-semibold text-center">Approbation</TableHead>
+                <TableHead className="font-semibold text-center">Nota Prom.</TableHead>
                 <TableHead className="font-semibold">Avance Prom.</TableHead>
               </TableRow>
             </TableHeader>
@@ -261,6 +289,18 @@ export function SuperAdminProgramasPage() {
                       <span>{programa.studentsCount}</span>
                     </div>
                   </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-sm font-medium">{programa.engagementRate}%</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-sm font-medium">{programa.completionRate}%</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-sm font-medium">{programa.approbationRate}%</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-sm font-medium">{programa.avgGrade}</span>
+                  </TableCell>
                   <TableCell>
                     <div className="w-28">
                       <div className="flex items-center justify-between text-xs mb-1">
@@ -274,7 +314,7 @@ export function SuperAdminProgramasPage() {
               ))}
               {filteredProgramas.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={14} className="text-center py-8 text-muted-foreground">
                     No hay programas que mostrar con los filtros seleccionados
                   </TableCell>
                 </TableRow>

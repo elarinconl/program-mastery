@@ -30,6 +30,10 @@ interface ProgramaRow {
   pendingEvaluations: number;
   pendingComments: number;
   avgProgress: number;
+  engagementRate: number;
+  completionRate: number;
+  approbationRate: number;
+  avgGrade: number;
 }
 
 const mockProgramas: ProgramaRow[] = [
@@ -46,6 +50,10 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 2,
     pendingComments: 5,
     avgProgress: 68,
+    engagementRate: 60,
+    completionRate: 25,
+    approbationRate: 20,
+    avgGrade: 7.2,
   },
   {
     id: '2',
@@ -60,6 +68,10 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 1,
     pendingComments: 2,
     avgProgress: 54,
+    engagementRate: 72,
+    completionRate: 30,
+    approbationRate: 22,
+    avgGrade: 6.8,
   },
   {
     id: '3',
@@ -74,6 +86,10 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 0,
     pendingComments: 1,
     avgProgress: 82,
+    engagementRate: 85,
+    completionRate: 45,
+    approbationRate: 38,
+    avgGrade: 8.1,
   },
   {
     id: '4',
@@ -88,6 +104,10 @@ const mockProgramas: ProgramaRow[] = [
     pendingEvaluations: 0,
     pendingComments: 0,
     avgProgress: 45,
+    engagementRate: 55,
+    completionRate: 15,
+    approbationRate: 10,
+    avgGrade: 6.5,
   },
 ];
 
@@ -123,6 +143,10 @@ export function InstructorProgramasPage() {
                 <TableHead className="font-semibold text-center">Clases</TableHead>
                 <TableHead className="font-semibold text-center">Duración</TableHead>
                 <TableHead className="font-semibold text-center">Estudiantes</TableHead>
+                <TableHead className="font-semibold text-center">Engagement</TableHead>
+                <TableHead className="font-semibold text-center">Completion</TableHead>
+                <TableHead className="font-semibold text-center">Approbation</TableHead>
+                <TableHead className="font-semibold text-center">Nota Prom.</TableHead>
                 <TableHead className="font-semibold">Avance Prom.</TableHead>
               </TableRow>
             </TableHeader>
@@ -165,6 +189,18 @@ export function InstructorProgramasPage() {
                       <Users className="w-4 h-4 text-muted-foreground" />
                       <span>{programa.studentsCount}</span>
                     </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-sm font-medium">{programa.engagementRate}%</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-sm font-medium">{programa.completionRate}%</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-sm font-medium">{programa.approbationRate}%</span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-sm font-medium">{programa.avgGrade}</span>
                   </TableCell>
                   <TableCell>
                     <div className="w-28">
