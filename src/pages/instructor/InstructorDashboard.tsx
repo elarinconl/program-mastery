@@ -7,6 +7,10 @@ import {
   Users,
   ArrowRight,
   AlertCircle,
+  TrendingUp,
+  CheckCircle,
+  Award,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +21,10 @@ const mockStats = {
   evaluacionesPendientes: 3,
   comentariosSinResponder: 8,
   estudiantes: 156,
+  engagementRate: 68,
+  completionRate: 29,
+  approbationRate: 22,
+  avgGrade: 7.2,
 };
 
 const mockPendingEvaluations = [
@@ -115,6 +123,53 @@ export function InstructorDashboard() {
             <Link to={estudiantesLink} className="text-sm text-primary hover:underline mt-2 inline-block">
               Ver estudiantes →
             </Link>
+          </div>
+        </div>
+
+        {/* Métricas Globales */}
+        <div className="mb-8">
+          <h2 className="font-semibold text-foreground mb-4">Métricas Globales</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="stat-card">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">Engagement Rate</p>
+              <p className="text-3xl font-bold">{mockStats.engagementRate}%</p>
+              <p className="text-xs text-muted-foreground mt-1">Promedio todos los programas</p>
+            </div>
+            <div className="stat-card">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2 bg-success/10 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-success" />
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">Completion Rate</p>
+              <p className="text-3xl font-bold">{mockStats.completionRate}%</p>
+              <p className="text-xs text-muted-foreground mt-1">Promedio todos los programas</p>
+            </div>
+            <div className="stat-card">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2 bg-warning/10 rounded-lg">
+                  <Award className="w-5 h-5 text-warning" />
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">Approbation Rate</p>
+              <p className="text-3xl font-bold">{mockStats.approbationRate}%</p>
+              <p className="text-xs text-muted-foreground mt-1">Promedio todos los programas</p>
+            </div>
+            <div className="stat-card">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2 bg-blue-500/10 rounded-lg">
+                  <BarChart3 className="w-5 h-5 text-blue-500" />
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">Nota Promedio</p>
+              <p className="text-3xl font-bold">{mockStats.avgGrade}</p>
+              <p className="text-xs text-muted-foreground mt-1">Sobre 10 · todos los programas</p>
+            </div>
           </div>
         </div>
 

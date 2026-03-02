@@ -13,6 +13,9 @@ import {
   MessageSquare,
   ArrowRight,
   TrendingUp,
+  CheckCircle,
+  Award,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -339,7 +342,51 @@ export function InstructorProgramaDetail() {
           </div>
         </div>
 
-        {/* Métricas simplificadas - solo una vez */}
+        {/* Métricas de rendimiento */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-primary" />
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground mb-1">Engagement Rate</p>
+            <p className="text-3xl font-bold">60%</p>
+            <p className="text-xs text-muted-foreground mt-1">205 de 342 completaron módulo 1</p>
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-success/10 rounded-lg">
+                <CheckCircle className="w-5 h-5 text-success" />
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground mb-1">Completion Rate</p>
+            <p className="text-3xl font-bold">25%</p>
+            <p className="text-xs text-muted-foreground mt-1">86 completaron todas las clases</p>
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-warning/10 rounded-lg">
+                <Award className="w-5 h-5 text-warning" />
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground mb-1">Approbation Rate</p>
+            <p className="text-3xl font-bold">20%</p>
+            <p className="text-xs text-muted-foreground mt-1">68 aprobaron y obtuvieron certificación</p>
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <BarChart3 className="w-5 h-5 text-blue-500" />
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground mb-1">Nota Promedio</p>
+            <p className="text-3xl font-bold">7.2</p>
+            <p className="text-xs text-muted-foreground mt-1">Sobre 10 · todos los que presentaron</p>
+          </Card>
+        </div>
+
+        {/* Métricas operativas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
