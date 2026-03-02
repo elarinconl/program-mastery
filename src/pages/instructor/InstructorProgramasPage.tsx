@@ -4,6 +4,10 @@ import {
   Clock,
   Users,
   Layers,
+  TrendingUp,
+  CheckCircle,
+  Award,
+  BarChart3,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -121,6 +125,11 @@ const tierColors = {
 export function InstructorProgramasPage() {
   const navigate = useNavigate();
 
+  const avgEngagement = Math.round(mockProgramas.reduce((s, p) => s + p.engagementRate, 0) / mockProgramas.length);
+  const avgCompletion = Math.round(mockProgramas.reduce((s, p) => s + p.completionRate, 0) / mockProgramas.length);
+  const avgApprobation = Math.round(mockProgramas.reduce((s, p) => s + p.approbationRate, 0) / mockProgramas.length);
+  const avgGrade = (mockProgramas.reduce((s, p) => s + p.avgGrade, 0) / mockProgramas.length).toFixed(1);
+
   return (
     <MainLayout breadcrumbs={[{ label: 'mi workspace' }, { label: 'mis programas' }]}>
       <div className="max-w-7xl">
@@ -128,6 +137,30 @@ export function InstructorProgramasPage() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-foreground">Mis Programas</h1>
           <p className="text-muted-foreground">Programas asignados para gestionar</p>
+        </div>
+
+        {/* Consolidated Metrics */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-card border border-border rounded-xl p-4 flex flex-col items-center">
+            <TrendingUp className="w-5 h-5 text-primary mb-1" />
+            <span className="text-2xl font-bold text-foreground">{avgEngagement}%</span>
+            <span className="text-xs text-muted-foreground">Engagement Rate</span>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-4 flex flex-col items-center">
+            <CheckCircle className="w-5 h-5 text-emerald-500 mb-1" />
+            <span className="text-2xl font-bold text-foreground">{avgCompletion}%</span>
+            <span className="text-xs text-muted-foreground">Completion Rate</span>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-4 flex flex-col items-center">
+            <Award className="w-5 h-5 text-amber-500 mb-1" />
+            <span className="text-2xl font-bold text-foreground">{avgApprobation}%</span>
+            <span className="text-xs text-muted-foreground">Approbation Rate</span>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-4 flex flex-col items-center">
+            <BarChart3 className="w-5 h-5 text-blue-500 mb-1" />
+            <span className="text-2xl font-bold text-foreground">{avgGrade}</span>
+            <span className="text-xs text-muted-foreground">Nota Promedio</span>
+          </div>
         </div>
 
         {/* Programs Table */}
